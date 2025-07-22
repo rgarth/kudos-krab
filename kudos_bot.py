@@ -76,13 +76,13 @@ def handle_kudos_command(ack, command, say):
     
     # Parse kudos command: /kk @user1 @user2 message
     if not text:
-        say("HEY BUDDY! 🦀 Here's how to make some waves:\n• `/kk @user message` - Send love to one person\n• `/kk @user1 @user2 message` - Spread the love to multiple people\n• `/kk leaderboard` - See who's making the biggest splash\n• `/kk stats` - Check your own kudos journey\n\nNow go make some magic! 🌊✨")
+        say("HEY THERE, BUDDY! 🦀 Here's how to make some waves, fella:\n• `/kk @user message` - Send love to one person\n• `/kk @user1 @user2 message` - Spread the love to multiple people\n• `/kk leaderboard` - See who's making the biggest splash\n• `/kk stats` - Check your own kudos journey\n\nNow go make some magic, bud! 🌊✨")
         return
     
     # Extract all mentioned users
     mentioned_users = extract_user_mentions(text)
     if not mentioned_users:
-        say("HEY THERE! 🦀 You gotta mention someone with @username to send them some love! 🌊 Don't be shy - spread those good vibes! ✨")
+        say("HEY THERE, BUD! 🦀 You gotta mention someone with @username to send them some love! 🌊 Don't be shy, fella - spread those good vibes! ✨")
         return
     
     # Remove duplicates while preserving order
@@ -93,13 +93,13 @@ def handle_kudos_command(ack, command, say):
     
     # Check if user is trying to send kudos to themselves
     if user_id in unique_users:
-        say("NICE TRY! 😂 But you can't give yourself kudos, you silly crab! 🦀 Save that self-love for someone else! 🌊✨")
+        say("NICE TRY, BUDDY! 😂 But you can't give yourself kudos, you silly crab! 🦀 Save that self-love for someone else, fella! 🌊✨ Maybe try giving yourself a high-five instead? 🤚")
         return
     
     # Extract message
     message = extract_message_text(text)
     if not message:
-        say("COME ON! 🦀 You can't just send empty kudos! 🌊 Add some words to make it special - that's what makes the ocean sparkle! ✨")
+        say("COME ON, BUD! 🦀 You can't just send empty kudos! 🌊 Add some words to make it special, fella - that's what makes the ocean sparkle! ✨")
         return
     
     # Check monthly quota for multiple kudos
@@ -109,7 +109,7 @@ def handle_kudos_command(ack, command, say):
     kudos_needed = len(unique_users)
     
     if monthly_count + kudos_needed > MONTHLY_QUOTA:
-        say(f"YIKES! 😅 Looks like you're all out of kudos juice! 🦀 You need {kudos_needed} more but only have {MONTHLY_QUOTA - monthly_count} left this month. Time to wait for the next tide to roll in! 🌊")
+        say(f"YIKES, BUDDY! 😅 Looks like you're all out of kudos juice! 🦀 You need {kudos_needed} more but only have {MONTHLY_QUOTA - monthly_count} left this month, fella. Time to wait for the next tide to roll in! 🌊")
         return
     
     # Record kudos for each user
@@ -144,13 +144,13 @@ def handle_kudos_command(ack, command, say):
         # Confirm to user
         remaining = MONTHLY_QUOTA - monthly_count - len(successful_kudos)
         if len(successful_kudos) == 1:
-            say(f"BOOM! 💥 Kudos delivered like a tidal wave! 🦀 You've got {remaining} more kudos left this month - keep that energy flowing! 🌊✨")
+            say(f"BOOM, BUDDY! 💥 Kudos delivered like a tidal wave! 🦀 You've got {remaining} more kudos left this month, fella - keep that energy flowing! 🌊✨")
         else:
-            say(f"WHOA! 🚀 You just made it RAIN kudos on {len(successful_kudos)} people! 🦀 That's {remaining} more kudos in your tank - you're on FIRE! 🔥🌊")
+            say(f"WHOA, BUD! 🚀 You just made it RAIN kudos on {len(successful_kudos)} people! 🦀 That's {remaining} more kudos in your tank, fella - you're on FIRE! 🔥🌊")
     
     if failed_kudos:
         failed_mentions = " ".join([f"<@{user}>" for user in failed_kudos])
-        say(f"OOPS! 😅 Looks like the ocean got a bit choppy for {failed_mentions}! 🦀 Let's try that again - the tide will be better this time! 🌊")
+        say(f"OOPS, BUDDY! 😅 Looks like the ocean got a bit choppy for {failed_mentions}! 🦀 Let's try that again, fella - the tide will be better this time! 🌊")
 
 def handle_leaderboard_command(say):
     """Handle leaderboard request"""
@@ -163,7 +163,7 @@ def handle_leaderboard_command(say):
         say(formatted_leaderboard)
     except Exception as e:
         logger.error(f"Error getting leaderboard: {e}")
-        say("YIKES! 😅 The ocean got a bit rough while I was checking the leaderboard! 🦀 Let's try that again - the waves should be calmer now! 🌊")
+        say("YIKES, BUDDY! 😅 The ocean got a bit rough while I was checking the leaderboard! 🦀 Let's try that again, fella - the waves should be calmer now! 🌊")
 
 def handle_stats_command(user_id, say):
     """Handle stats request"""
@@ -185,12 +185,12 @@ def handle_stats_command(user_id, say):
         say(stats_message)
     except Exception as e:
         logger.error(f"Error getting stats: {e}")
-        say("OOPS! 😅 The ocean got a bit murky while I was checking your stats! 🦀 Let's try that again - the water should be clearer now! 🌊")
+        say("OOPS, BUDDY! 😅 The ocean got a bit murky while I was checking your stats! 🦀 Let's try that again, fella - the water should be clearer now! 🌊")
 
 @app.event("app_mention")
 def handle_app_mention(event, say):
     """Handle when the bot is mentioned"""
-    say("HEY THERE, BUDDY! 🦀 I'm your favorite kudos coach! 🌊\n\nHere's how to make some waves:\n• `/kk @user message` - Send love to one person\n• `/kk @user1 @user2 message` - Spread the love to multiple people\n• `/kk leaderboard` - See who's making the biggest splash\n• `/kk stats` - Check your own kudos journey\n\nLet's make this ocean sparkle! ✨")
+    say("HEY THERE, BUDDY! 🦀 I'm your favorite kudos coach! 🌊\n\nHere's how to make some waves, fella:\n• `/kk @user message` - Send love to one person\n• `/kk @user1 @user2 message` - Spread the love to multiple people\n• `/kk leaderboard` - See who's making the biggest splash\n• `/kk stats` - Check your own kudos journey\n\nLet's make this ocean sparkle, bud! ✨")
 
 # AWS Lambda handler
 def lambda_handler(event, context):
