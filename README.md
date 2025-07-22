@@ -14,6 +14,7 @@ A Slack bot for recording and managing team kudos with a crab-themed twist!
 ## Commands
 
 - `/kk @person message` - Send kudos to someone
+- `/kk @person1 @person2 message` - Send kudos to multiple people (costs multiple quota)
 - `/kk leaderboard` - Show monthly leaderboard
 - `/kk stats` - Show your personal kudos statistics
 
@@ -83,7 +84,7 @@ The bot uses connection pooling optimized for Aiven's free tier:
 ## Slack App Configuration
 
 1. Create a new Slack app at https://api.slack.com/apps
-2. Add slash command `/kk` with description "Send kudos to team members"
+2. Add slash command `/kk` with description "Send kudos to team members (supports multiple recipients)"
 3. Configure Events API subscription for `app_mention`
 4. Install app to workspace
 5. Copy bot token and signing secret to environment variables
