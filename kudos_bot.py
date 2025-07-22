@@ -39,22 +39,22 @@ def format_leaderboard(leaderboard_data, month, year):
     month_name = datetime(year, month, 1).strftime("%B %Y")
     
     # Format top senders
-    senders_text = "*Top Kudos Senders:*\n"
+    senders_text = "*🏆 TOP KUDOS SPREADERS 🏆*\n"
     if leaderboard_data['senders']:
         for i, (sender, count) in enumerate(leaderboard_data['senders'], 1):
-            senders_text += f"{i}. <@{sender}> - {count} kudos\n"
+            senders_text += f"{i}. <@{sender}> - {count} kudos 🌊\n"
     else:
-        senders_text += "No kudos sent this month yet!\n"
+        senders_text += "No kudos sent this month yet! Let's get this party started! 🦀\n"
     
     # Format top receivers
-    receivers_text = "\n*Top Kudos Receivers:*\n"
+    receivers_text = "\n*🌟 TOP KUDOS RECEIVERS 🌟*\n"
     if leaderboard_data['receivers']:
         for i, (receiver, count) in enumerate(leaderboard_data['receivers'], 1):
-            receivers_text += f"{i}. <@{receiver}> - {count} kudos\n"
+            receivers_text += f"{i}. <@{receiver}> - {count} kudos 🐚\n"
     else:
-        receivers_text += "No kudos received this month yet!\n"
+        receivers_text += "No kudos received this month yet! Time to spread some love! 🌊\n"
     
-    return f"*🦀 {month_name} Kudos Leaderboard 🦀*\n\n{senders_text}{receivers_text}"
+    return f"*🦀 {month_name} KUDOS CHAMPIONS 🦀*\n\n{senders_text}{receivers_text}\n\n*Keep making those waves!* 🌊✨"
 
 @app.command("/kk")
 def handle_kudos_command(ack, command, say):
@@ -76,13 +76,13 @@ def handle_kudos_command(ack, command, say):
     
     # Parse kudos command: /kk @user1 @user2 message
     if not text:
-        say("Usage: `/kk @user message` or `/kk @user1 @user2 message` or `/kk leaderboard` or `/kk stats`")
+        say("HEY BUDDY! 🦀 Here's how to make some waves:\n• `/kk @user message` - Send love to one person\n• `/kk @user1 @user2 message` - Spread the love to multiple people\n• `/kk leaderboard` - See who's making the biggest splash\n• `/kk stats` - Check your own kudos journey\n\nNow go make some magic! 🌊✨")
         return
     
     # Extract all mentioned users
     mentioned_users = extract_user_mentions(text)
     if not mentioned_users:
-        say("Please mention at least one user with @username to send kudos!")
+        say("HEY THERE! 🦀 You gotta mention someone with @username to send them some love! 🌊 Don't be shy - spread those good vibes! ✨")
         return
     
     # Remove duplicates while preserving order
@@ -93,13 +93,13 @@ def handle_kudos_command(ack, command, say):
     
     # Check if user is trying to send kudos to themselves
     if user_id in unique_users:
-        say("You can't send kudos to yourself! 🦀")
+        say("NICE TRY! 😂 But you can't give yourself kudos, you silly crab! 🦀 Save that self-love for someone else! 🌊✨")
         return
     
     # Extract message
     message = extract_message_text(text)
     if not message:
-        say("Please include a message with your kudos!")
+        say("COME ON! 🦀 You can't just send empty kudos! 🌊 Add some words to make it special - that's what makes the ocean sparkle! ✨")
         return
     
     # Check monthly quota for multiple kudos
@@ -109,7 +109,7 @@ def handle_kudos_command(ack, command, say):
     kudos_needed = len(unique_users)
     
     if monthly_count + kudos_needed > MONTHLY_QUOTA:
-        say(f"You don't have enough kudos remaining! You need {kudos_needed} kudos but only have {MONTHLY_QUOTA - monthly_count} remaining this month. 🦀")
+        say(f"YIKES! 😅 Looks like you're all out of kudos juice! 🦀 You need {kudos_needed} more but only have {MONTHLY_QUOTA - monthly_count} left this month. Time to wait for the next tide to roll in! 🌊")
         return
     
     # Record kudos for each user
@@ -126,10 +126,10 @@ def handle_kudos_command(ack, command, say):
     if successful_kudos:
         # Send announcement to channel
         if len(successful_kudos) == 1:
-            announcement = f"🦀 *Kudos Alert!* 🦀\n<@{user_id}> just sent kudos to <@{successful_kudos[0]}>:\n\n> {message}"
+            announcement = f"🦀 *OH SNAP!* 🦀\n<@{user_id}> just dropped some MAJOR kudos on <@{successful_kudos[0]}>! 🌊\n\n> {message}\n\n*That's what I'm talking about!* 🦀✨"
         else:
             user_mentions = " ".join([f"<@{user}>" for user in successful_kudos])
-            announcement = f"🦀 *Kudos Alert!* 🦀\n<@{user_id}> just sent kudos to {user_mentions}:\n\n> {message}"
+            announcement = f"🦀 *HOLY CRAB!* 🦀\n<@{user_id}> just went FULL OCEAN MODE and sent kudos to {user_mentions}! 🌊🐚\n\n> {message}\n\n*Now THAT'S how you make waves!* 🦀✨"
         
         if SLACK_CHANNEL_ID:
             try:
@@ -144,13 +144,13 @@ def handle_kudos_command(ack, command, say):
         # Confirm to user
         remaining = MONTHLY_QUOTA - monthly_count - len(successful_kudos)
         if len(successful_kudos) == 1:
-            say(f"Kudos sent! 🦀 You have {remaining} kudos remaining this month.")
+            say(f"BOOM! 💥 Kudos delivered like a tidal wave! 🦀 You've got {remaining} more kudos left this month - keep that energy flowing! 🌊✨")
         else:
-            say(f"Kudos sent to {len(successful_kudos)} people! 🦀 You have {remaining} kudos remaining this month.")
+            say(f"WHOA! 🚀 You just made it RAIN kudos on {len(successful_kudos)} people! 🦀 That's {remaining} more kudos in your tank - you're on FIRE! 🔥🌊")
     
     if failed_kudos:
         failed_mentions = " ".join([f"<@{user}>" for user in failed_kudos])
-        say(f"Failed to send kudos to: {failed_mentions}. Please try again!")
+        say(f"OOPS! 😅 Looks like the ocean got a bit choppy for {failed_mentions}! 🦀 Let's try that again - the tide will be better this time! 🌊")
 
 def handle_leaderboard_command(say):
     """Handle leaderboard request"""
@@ -163,7 +163,7 @@ def handle_leaderboard_command(say):
         say(formatted_leaderboard)
     except Exception as e:
         logger.error(f"Error getting leaderboard: {e}")
-        say("Sorry, there was an error getting the leaderboard. Please try again!")
+        say("YIKES! 😅 The ocean got a bit rough while I was checking the leaderboard! 🦀 Let's try that again - the waves should be calmer now! 🌊")
 
 def handle_stats_command(user_id, say):
     """Handle stats request"""
@@ -173,22 +173,24 @@ def handle_stats_command(user_id, say):
         current_year = datetime.now().year
         monthly_count = db_manager.get_monthly_kudos_count(user_id, current_month, current_year)
         
-        stats_message = f"""🦀 *Your Kudos Stats* 🦀
+        stats_message = f"""🦀 *YOUR KUDOS JOURNEY* 🦀
 
-*Total Kudos Sent:* {stats['total_sent']}
-*Total Kudos Received:* {stats['total_received']}
-*Kudos Sent This Month:* {stats['monthly_sent']}
-*Remaining This Month:* {MONTHLY_QUOTA - monthly_count}"""
+*Total Kudos Sent:* {stats['total_sent']} 🌊
+*Total Kudos Received:* {stats['total_received']} 🐚
+*Kudos Sent This Month:* {stats['monthly_sent']} 🚀
+*Remaining This Month:* {MONTHLY_QUOTA - monthly_count} ✨
+
+*You're absolutely CRUSHING it!* 🔥"""
         
         say(stats_message)
     except Exception as e:
         logger.error(f"Error getting stats: {e}")
-        say("Sorry, there was an error getting your stats. Please try again!")
+        say("OOPS! 😅 The ocean got a bit murky while I was checking your stats! 🦀 Let's try that again - the water should be clearer now! 🌊")
 
 @app.event("app_mention")
 def handle_app_mention(event, say):
     """Handle when the bot is mentioned"""
-    say("Hi! I'm Kudos Krab 🦀 Use `/kk @user message` to send kudos, `/kk @user1 @user2 message` to send to multiple people, `/kk leaderboard` to see the monthly leaderboard, or `/kk stats` to see your stats!")
+    say("HEY THERE, BUDDY! 🦀 I'm your favorite kudos coach! 🌊\n\nHere's how to make some waves:\n• `/kk @user message` - Send love to one person\n• `/kk @user1 @user2 message` - Spread the love to multiple people\n• `/kk leaderboard` - See who's making the biggest splash\n• `/kk stats` - Check your own kudos journey\n\nLet's make this ocean sparkle! ✨")
 
 # AWS Lambda handler
 def lambda_handler(event, context):
