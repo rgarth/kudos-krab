@@ -105,7 +105,7 @@ MONTHLY_QUOTA=10
 
 2. Start your bot locally:
    ```bash
-   python local_test.py
+   python run_local.py
    ```
 
 3. In another terminal, expose localhost:

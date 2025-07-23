@@ -71,7 +71,7 @@ The bot uses connection pooling optimized for Aiven's free tier:
 3. Set up Aiven PostgreSQL database
 4. Configure Slack app and environment variables
 5. Create `.env` file (see `env.example`)
-6. Run locally: `python local_test.py`
+6. Run locally: `python run_local.py`
 
 ### Local Testing Setup
 
@@ -102,7 +102,7 @@ The bot uses connection pooling optimized for Aiven's free tier:
 
 5. **Run the bot**:
    ```bash
-   python local_test.py
+   python run_local.py
    ```
 
 ## Deployment

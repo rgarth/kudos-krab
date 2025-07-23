@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
-Local testing script for Kudos Krab
+Simple local testing script for Kudos Krab
 """
 import os
 from dotenv import load_dotenv
-from kudos_bot import initialize_app
 
 def main():
-    # Load environment variables from .env file
+    # Load environment variables from .env file FIRST
     load_dotenv()
     
     # Check required environment variables
@@ -36,13 +35,8 @@ def main():
     print("🔧 Use ngrok or similar to expose localhost to Slack")
     print("\nPress Ctrl+C to stop the bot")
     
-    # Initialize the app
-    initialize_app()
-    
-    # Import app after initialization
+    # Import and start the bot AFTER environment variables are loaded
     from kudos_bot import app
-    
-    # Start the bot
     app.start(port=3000)
 
 if __name__ == "__main__":
