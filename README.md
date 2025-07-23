@@ -60,6 +60,7 @@ The bot uses connection pooling optimized for Aiven's free tier:
 
 - `SLACK_BOT_TOKEN` - Slack bot token
 - `SLACK_SIGNING_SECRET` - Slack app signing secret
+- `SLACK_BOT_USER_ID` - Bot's user ID (starts with U, found in Slack app settings)
 - `DATABASE_URL` - PostgreSQL connection string (Aiven format: `postgres://username:password@host:port/database?sslmode=require`)
 - `SLACK_CHANNEL_ID` - Channel ID for kudos announcements
 - `MONTHLY_QUOTA` - Maximum kudos per person per month (default: 10)

@@ -24,7 +24,7 @@ MONTHLY_QUOTA = int(os.environ.get("MONTHLY_QUOTA", "10"))
 SLACK_CHANNEL_ID = os.environ.get("SLACK_CHANNEL_ID")
 
 def extract_user_mentions(text):
-    """Extract all user IDs from Slack mention format <@U1234567890>"""
+    """Extract all user IDs from Slack mention format <@U1234567890> from anywhere in the text"""
     matches = re.findall(r'<@([A-Z0-9]+)>', text)
     return matches
 
@@ -33,6 +33,28 @@ def extract_message_text(text):
     # Remove all user mentions and clean up the text
     cleaned_text = re.sub(r'<@[A-Z0-9]+>\s*', '', text).strip()
     return cleaned_text
+
+def show_help_message(say):
+    """Show the help message with all available commands"""
+    help_text = """HEY THERE, BUDDY! 🦀 Here's how to make some waves, fella:
+
+*🎯 Send Kudos:*
+• `/kk @user message` - Send love to one person
+• `/kk @user1 @user2 message` - Spread the love to multiple people
+• `/kk Thanks @user for the help!` - Free-form messages work too!
+
+*📊 Commands:*
+• `/kk leaderboard` - See who's making the biggest splash this month
+• `/kk stats` - Check your own kudos journey
+• `/kk help` - Show this help message
+
+*💡 Examples:*
+• `/kk @alice thanks for the awesome help!`
+• `/kk @bob @charlie you both crushed that project!`
+• `/kk Great work @david on the presentation yesterday`
+
+Now go make some magic, bud! 🌊✨"""
+    say(help_text)
 
 def format_leaderboard(leaderboard_data, month, year):
     """Format leaderboard data for Slack message"""
@@ -64,8 +86,8 @@ def handle_kudos_command(ack, command, say):
     user_id = command["user_id"]
     text = command["text"].strip()
     
-    # Check if it's a command (starts with a word that's not a mention)
-    if text and not text.startswith('<@'):
+    # Check if it's a dedicated command (first word is a command)
+    if text:
         first_word = text.split()[0].lower()
         if first_word == "leaderboard":
             handle_leaderboard_command(say)
@@ -73,16 +95,23 @@ def handle_kudos_command(ack, command, say):
         elif first_word == "stats":
             handle_stats_command(user_id, say)
             return
+        elif first_word == "help":
+            show_help_message(say)
+            return
+        elif len(text.split()) == 1:
+            # Single word that's not a recognized command - show help
+            show_help_message(say)
+            return
     
-    # Parse kudos command: /kk @user1 @user2 message
+    # Parse kudos command: anything else is treated as a kudos message
     if not text:
-        say("HEY THERE, BUDDY! 🦀 Here's how to make some waves, fella:\n• `/kk @user message` - Send love to one person\n• `/kk @user1 @user2 message` - Spread the love to multiple people\n• `/kk leaderboard` - See who's making the biggest splash\n• `/kk stats` - Check your own kudos journey\n\nNow go make some magic, bud! 🌊✨")
+        show_help_message(say)
         return
     
     # Extract all mentioned users
     mentioned_users = extract_user_mentions(text)
     if not mentioned_users:
-        say("HEY THERE, BUD! 🦀 You gotta mention someone with @username to send them some love! 🌊 Don't be shy, fella - spread those good vibes! ✨")
+        say("HEY THERE, BUD! 🦀 You gotta mention someone with @username to send them some love! 🌊 Don't be shy, fella - spread those good vibes! ✨\n\nTry `/kk help` to see how to use the bot!")
         return
     
     # Remove duplicates while preserving order
@@ -94,6 +123,12 @@ def handle_kudos_command(ack, command, say):
     # Check if user is trying to send kudos to themselves
     if user_id in unique_users:
         say("NICE TRY, BUDDY! 😂 But you can't give yourself kudos, you silly crab! 🦀 Save that self-love for someone else, fella! 🌊✨ Maybe try giving yourself a high-five instead? 🤚")
+        return
+    
+    # Check if user is trying to send kudos to the bot
+    bot_user_id = os.environ.get("SLACK_BOT_USER_ID")
+    if bot_user_id and bot_user_id in unique_users:
+        say("AWWW, BUDDY! 🥺 You're trying to give ME kudos? That's so sweet! 🦀 *blushes in crab* 🌊✨ But I'm just here to help spread the love - save those kudos for your amazing teammates! 💕 Maybe try `/kk help` to see how to send kudos to others? 🦀")
         return
     
     # Extract message
