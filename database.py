@@ -21,8 +21,8 @@ class DatabaseManager:
                 raise ValueError("DATABASE_URL environment variable not set")
             
             # Parse connection string to get individual components
-            # Format: postgresql://username:password@host:port/database
-            if database_url.startswith('postgresql://'):
+            # Format: postgresql://username:password@host:port/database or postgres://username:password@host:port/database
+            if database_url.startswith('postgresql://') or database_url.startswith('postgres://'):
                 # Extract components for better error handling
                 self.connection_pool = pool.SimpleConnectionPool(
                     minconn=1,  # Minimum 1 connection
@@ -31,7 +31,7 @@ class DatabaseManager:
                 )
                 logger.info("Database connection pool initialized successfully")
             else:
-                raise ValueError("Invalid DATABASE_URL format")
+                raise ValueError("Invalid DATABASE_URL format - must start with 'postgresql://' or 'postgres://'")
                 
         except Exception as e:
             logger.error(f"Failed to initialize database pool: {e}")
