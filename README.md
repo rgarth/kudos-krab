@@ -70,7 +70,43 @@ The bot uses connection pooling optimized for Aiven's free tier:
 2. Install dependencies: `pip install -r requirements.txt`
 3. Set up Aiven PostgreSQL database
 4. Configure Slack app and environment variables
-5. Run locally: `python kudos_bot.py`
+5. Create `.env` file (see `env.example`)
+6. Run locally: `python local_test.py`
+
+### Local Testing Setup
+
+1. **Create Slack App** (if not done already):
+   - Go to https://api.slack.com/apps
+   - Create new app
+   - Add slash command `/kk`
+   - Configure Events API subscription for `app_mention`
+   - Install to workspace
+
+2. **Set up Aiven PostgreSQL**:
+   - Create free PostgreSQL database on Aiven
+   - Copy connection string
+
+3. **Create `.env` file**:
+   ```bash
+   cp env.example .env
+   # Edit .env with your actual values
+   ```
+
+4. **Expose localhost to Slack** (for Events API):
+   ```bash
+   # Install ngrok
+   brew install ngrok  # macOS
+   
+   # Expose localhost:3000
+   ngrok http 3000
+   
+   # Copy the https URL and add to Slack app's Events API Request URL
+   ```
+
+5. **Run the bot**:
+   ```bash
+   python local_test.py
+   ```
 
 ## Deployment
 
