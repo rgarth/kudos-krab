@@ -76,11 +76,8 @@ The bot uses connection pooling optimized for Aiven's free tier:
 ### Local Testing Setup
 
 1. **Create Slack App** (if not done already):
-   - Go to https://api.slack.com/apps
-   - Create new app
-   - Add slash command `/kk`
-   - Configure Events API subscription for `app_mention`
-   - Install to workspace
+   - Follow the detailed guide: [SLACK_SETUP.md](SLACK_SETUP.md)
+   - This includes step-by-step instructions for all Slack app configuration
 
 2. **Set up Aiven PostgreSQL**:
    - Create free PostgreSQL database on Aiven
@@ -119,11 +116,16 @@ The bot uses connection pooling optimized for Aiven's free tier:
 
 ## Slack App Configuration
 
-1. Create a new Slack app at https://api.slack.com/apps
-2. Add slash command `/kk` with description "Send kudos to team members (supports multiple recipients)"
-3. Configure Events API subscription for `app_mention`
-4. Install app to workspace
-5. Copy bot token and signing secret to environment variables
+**📖 Detailed Setup Guide**: [SLACK_SETUP.md](SLACK_SETUP.md)
+
+The guide includes:
+- Step-by-step Slack app creation
+- Required bot token scopes
+- Slash command configuration
+- Event subscriptions setup
+- Local testing with ngrok
+- Troubleshooting tips
+- Security best practices
 
 ## License
 
