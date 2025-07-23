@@ -37,7 +37,7 @@ def main():
     
     # Import and start the bot AFTER environment variables are loaded
     from kudos_bot import app
-    app.start(port=3000)
+    app.start(port=3000, path="/slack/events")
 
 if __name__ == "__main__":
     main() 

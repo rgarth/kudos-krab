@@ -108,6 +108,21 @@ class DatabaseManager:
                 result = cursor.fetchone()
                 return result[0] if result else 0
     
+    def get_monthly_kudos_received_count(self, user: str, month: int, year: int) -> int:
+        """Get the number of kudos received by a user in a specific month"""
+        sql = """
+        SELECT COUNT(*) FROM kudos 
+        WHERE receiver = %s 
+        AND EXTRACT(MONTH FROM timestamp) = %s 
+        AND EXTRACT(YEAR FROM timestamp) = %s
+        """
+        
+        with self.get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(sql, (user, month, year))
+                result = cursor.fetchone()
+                return result[0] if result else 0
+    
     def get_monthly_leaderboard(self, month: int, year: int):
         """Get monthly leaderboard for senders and receivers"""
         sender_sql = """

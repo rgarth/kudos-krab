@@ -30,6 +30,7 @@ This guide will walk you through creating and configuring a Slack app for Kudos 
    - `chat:write` - Send messages to channels
    - `commands` - Add slash commands
    - `app_mentions:read` - Read mentions of your app
+   - `users:read` - Read user information (required for username lookup)
 4. Click **"Install to Workspace"** at the top of the page
 5. After installation, copy the **"Bot User OAuth Token"** (starts with `xoxb-`) - this is your `SLACK_BOT_TOKEN`
 
@@ -76,9 +77,11 @@ This guide will walk you through creating and configuring a Slack app for Kudos 
 
 ## Step 8: Get Bot User ID
 
-1. In your Slack app settings, go to **"OAuth & Permissions"**
-2. Look for **"Bot User ID"** (starts with `U`)
-3. Copy this ID for your `SLACK_BOT_USER_ID` environment variable
+1. **Install your bot to your workspace** (if not done already)
+2. In Slack, **right-click on your bot's name** (in the sidebar or when mentioned)
+3. Select **"View profile"** or **"Get info"**
+4. Look for the **User ID** (starts with `U`)
+5. Copy this ID for your `SLACK_BOT_USER_ID` environment variable
 
 ## Step 9: Environment Variables Summary
 
@@ -87,10 +90,10 @@ After setup, you'll have these values for your `.env` file:
 ```bash
 # From OAuth & Permissions page
 SLACK_BOT_TOKEN=xoxb-your-bot-token-here
-SLACK_BOT_USER_ID=U1234567890
 
 # From Basic Information page  
 SLACK_SIGNING_SECRET=your-signing-secret-here
+SLACK_BOT_USER_ID=U1234567890
 
 # From channel details
 SLACK_CHANNEL_ID=C1234567890
