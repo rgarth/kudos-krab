@@ -1,38 +1,33 @@
 # Kudos Krab 🦀
 
-A Slack bot for recording and managing team kudos with a crab-themed twist!
+An overly enthusiastic Slack bot for recording team kudos with crab/ocean puns and summer camp counselor energy! 🌊
 
 ## Features
 
-- **Kudos Recording**: Send kudos to team members using `/kk` command
-- **Monthly Leaderboards**: View top kudos senders and receivers for the current month
-- **Personal Stats**: Check your own kudos sent and received
-- **Monthly Quotas**: Configurable limits on kudos per person per month
-- **PostgreSQL Backend**: Reliable data storage for all kudos records
-- **Connection Pooling**: Optimized for Aiven free tier (5 connection limit)
+- **Record Kudos**: `/kk Thanks @user for the awesome help!` 
+- **Multi-Recipient**: `/kk Great work @user1 @user2 @user3!` (costs 3 kudos)
+- **Monthly Leaderboard**: `/kk leaderboard` - Top senders and top 10 receivers
+- **Personal Stats**: `/kk stats` - Your sent/received kudos
+- **Monthly Quota**: 10 kudos per person per month (configurable)
+- **Bot Personality**: Overly enthusiastic with crab/ocean puns and familiar terms like "buddy", "friend"
 
 ## Commands
 
-- `/kk @person message` - Send kudos to someone
-- `/kk @person1 @person2 message` - Send kudos to multiple people (costs multiple quota)
+- `/kk @user message` - Send kudos to someone
+- `/kk @user1 @user2 message` - Send kudos to multiple people
 - `/kk leaderboard` - Show monthly leaderboard
-- `/kk stats` - Show your personal kudos statistics
+- `/kk stats` - Show your personal stats
+- `/kk help` - Show help message
 
 ## Architecture
 
-- **Language**: Python (AWS Lambda compatible)
-- **Database**: PostgreSQL (Aiven free tier)
-- **Deployment**: AWS Lambda
-- **Slack Integration**: Slack Events API (write-only)
-- **Connection Pooling**: Efficient database connection management
+- **Runtime**: Python 3.11
+- **Framework**: Slack Bolt
+- **Database**: PostgreSQL (Aiven free tier with connection pooling)
+- **Deployment**: AWS Lambda OR Docker container
+- **Response Time**: Sub-second for immediate feedback
 
-## Database Setup (Aiven)
-
-1. Create a free PostgreSQL database on [Aiven](https://aiven.io/)
-2. Note the connection details from the Aiven console
-3. The bot will automatically create the required tables on first run
-
-### Database Schema
+## Database Schema
 
 ```sql
 CREATE TABLE kudos (
@@ -49,85 +44,126 @@ CREATE INDEX idx_kudos_receiver ON kudos(receiver);
 CREATE INDEX idx_kudos_timestamp ON kudos(timestamp);
 ```
 
-### Connection Pooling
-
-The bot uses connection pooling optimized for Aiven's free tier:
-- **Min connections**: 1
-- **Max connections**: 3 (leaving 2 connections for safety)
-- **Automatic connection management**: Connections are properly returned to the pool
-
 ## Environment Variables
 
-- `SLACK_BOT_TOKEN` - Slack bot token
-- `SLACK_SIGNING_SECRET` - Slack app signing secret
-- `SLACK_BOT_USER_ID` - Bot's user ID (starts with U, found in Slack app settings)
-- `DATABASE_URL` - PostgreSQL connection string (Aiven format: `postgres://username:password@host:port/database?sslmode=require`)
+Copy `env.example` to `.env` and configure:
+
+```bash
+cp env.example .env
+```
+
+Required variables:
+- `SLACK_BOT_TOKEN` - Your Slack bot token
+- `SLACK_SIGNING_SECRET` - Your Slack app signing secret
 - `SLACK_CHANNEL_ID` - Channel ID for kudos announcements
-- `MONTHLY_QUOTA` - Maximum kudos per person per month (default: 10)
+- `DATABASE_URL` - PostgreSQL connection string (Aiven format: `postgres://username:password@host:port/database?sslmode=require`)
+- `MONTHLY_QUOTA` - Kudos quota per person per month (default: 10)
+- `SLACK_BOT_USER_ID` - Bot's Slack user ID (found by right-clicking bot in Slack)
 
-## Development
+## Deployment Options
 
-1. Clone the repository
-2. Install dependencies: `pip install -r requirements.txt`
-3. Set up Aiven PostgreSQL database
-4. Configure Slack app and environment variables
-5. Create `.env` file (see `env.example`)
-6. Run locally: `python run_local.py`
+### Option 1: AWS Lambda (Recommended for Production)
 
-### Local Testing Setup
+**Fast response times (~100-500ms) for immediate feedback**
 
-1. **Create Slack App** (if not done already):
-   - Follow the detailed guide: [SLACK_SETUP.md](SLACK_SETUP.md)
-   - This includes step-by-step instructions for all Slack app configuration
-
-2. **Set up Aiven PostgreSQL**:
-   - Create free PostgreSQL database on Aiven
-   - Copy connection string
-
-3. **Create `.env` file**:
+1. **Build Lambda package**:
    ```bash
+   chmod +x deploy.sh
+   ./deploy.sh
+   ```
+
+2. **Deploy to AWS Lambda**:
+   - Upload `kudos-krab-lambda.zip`
+   - Set environment variables
+   - Configure API Gateway trigger
+
+### Option 2: Docker Container
+
+**Flexible deployment for any environment**
+
+1. **Build and run locally**:
+   ```bash
+   # Build image
+   docker build -t kudos-krab .
+   
+   # Run with environment variables
+   docker run -p 3000:3000 --env-file .env kudos-krab
+   ```
+
+2. **Using Docker Compose**:
+   ```bash
+   docker-compose up --build
+   ```
+
+3. **Deploy to any container platform**:
+   - AWS ECS/Fargate
+   - Google Cloud Run
+   - Azure Container Instances
+   - Kubernetes
+   - Heroku
+
+## Local Development
+
+### Prerequisites
+
+- Python 3.11+
+- PostgreSQL database (Aiven free tier recommended)
+- Slack app configured (see `SLACK_SETUP.md`)
+- ngrok for local testing
+
+### Setup
+
+1. **Clone and setup**:
+   ```bash
+   git clone <your-repo>
+   cd kudos-krab
    cp env.example .env
-   # Edit .env with your actual values
+   # Edit .env with your values
    ```
 
-4. **Expose localhost to Slack** (for Events API):
+2. **Install dependencies**:
    ```bash
-   # Install ngrok
-   brew install ngrok  # macOS
-   
-   # Expose localhost:3000
-   ngrok http 3000
-   
-   # Copy the https URL and add to Slack app's Events API Request URL
+   pip install -r requirements.txt
    ```
 
-5. **Run the bot**:
+3. **Run locally**:
    ```bash
+   # Option 1: Direct Python
    python run_local.py
+   
+   # Option 2: Docker
+   docker-compose up --build
    ```
 
-## Deployment
+4. **Expose to Slack**:
+   ```bash
+   ngrok http 3000
+   # Update Slack app Request URL to: https://your-ngrok-url.ngrok.io/slack/events
+   ```
 
-1. Run the deployment script: `./deploy.sh`
-2. Upload `kudos-krab-lambda.zip` to AWS Lambda
-3. Set handler to: `lambda_function.lambda_handler`
-4. Configure environment variables
-5. Set timeout to 30 seconds
-6. Configure Slack Events API endpoint
+## Database Utilities
 
-## Slack App Configuration
+### Clear Old Kudos
 
-**📖 Detailed Setup Guide**: [SLACK_SETUP.md](SLACK_SETUP.md)
+```bash
+# Preview kudos before a date
+python clear_kudos.py --preview 2024-01-01
 
-The guide includes:
-- Step-by-step Slack app creation
-- Required bot token scopes
-- Slash command configuration
-- Event subscriptions setup
-- Local testing with ngrok
-- Troubleshooting tips
-- Security best practices
+# Clear kudos before a date
+python clear_kudos.py 2024-01-01
+
+# Clear kudos before now (current timestamp)
+python clear_kudos.py now
+```
+
+## Slack App Setup
+
+See `SLACK_SETUP.md` for detailed Slack app configuration instructions.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details. 
+MIT License - see `LICENSE` file.
+
+---
+
+**🦀 Built with enthusiasm and way too many crab puns! 🌊** 
