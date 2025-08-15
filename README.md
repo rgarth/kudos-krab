@@ -25,7 +25,6 @@ An overly enthusiastic Slack bot for recording team kudos
 - **Framework**: Slack Bolt
 - **Database**: PostgreSQL (Aiven free tier with connection pooling)
 - **Deployment**: AWS Lambda OR Docker container
-- **Response Time**: Sub-second for immediate feedback
 
 ## Database Schema
 
