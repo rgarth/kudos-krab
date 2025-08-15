@@ -1,6 +1,6 @@
 # Kudos Krab 🦀
 
-An overly enthusiastic Slack bot for recording team kudos with crab/ocean puns and summer camp counselor energy! 🌊
+An overly enthusiastic Slack bot for recording team kudos
 
 ## Features
 
@@ -165,5 +165,3 @@ See `SLACK_SETUP.md` for detailed Slack app configuration instructions.
 MIT License - see `LICENSE` file.
 
 ---
-
-**🦀 Built with enthusiasm and way too many crab puns! 🌊** 
