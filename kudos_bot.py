@@ -60,7 +60,7 @@ def handle_kudos_command_wrapper(ack, command, say, respond):
             return
     
     # Handle kudos command
-    handle_kudos_command(ack, command, say, respond, app, db_manager)
+    handle_kudos_command(command, say, respond, app, db_manager)
 
 
 @app.event("app_mention")

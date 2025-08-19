@@ -17,7 +17,7 @@ from utils.message_formatter import (
 logger = logging.getLogger(__name__)
 
 
-def handle_kudos_command(ack, command, say, respond, app, db_manager):
+def handle_kudos_command(command, say, respond, app, db_manager):
     """Handle the /kk slash command"""
     user_id = command["user_id"]
     text = command["text"].strip()
