@@ -35,6 +35,8 @@ def log_request(logger, body, next):
 @app.command("/kk")
 def handle_kudos_command_wrapper(ack, command, say, respond):
     """Handle the /kk slash command"""
+    ack()  # Always acknowledge the command first
+    
     user_id = command["user_id"]
     text = command["text"].strip()
     

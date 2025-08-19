@@ -19,17 +19,8 @@ logger = logging.getLogger(__name__)
 
 def handle_kudos_command(ack, command, say, respond, app, db_manager):
     """Handle the /kk slash command"""
-    ack()
-    
     user_id = command["user_id"]
     text = command["text"].strip()
-    
-    # Check if it's a dedicated command (first word is a command)
-    if text:
-        first_word = text.split()[0].lower()
-        if first_word in ["leaderboard", "stats", "help"]:
-            # These are handled by other handlers, return early
-            return False
     
     # Parse kudos command: anything else is treated as a kudos message
     if not text:
@@ -59,7 +50,9 @@ def handle_kudos_command(ack, command, say, respond, app, db_manager):
     unique_users = remove_duplicate_users(user_ids)
     
     # Validate recipients
+    logger.info(f"Validating recipients - user_id: {user_id}, unique_users: {unique_users}, bot_user_id: {SLACK_BOT_USER_ID}")
     validation_errors = validate_kudos_recipients(user_id, unique_users, SLACK_BOT_USER_ID)
+    logger.info(f"Validation errors: {validation_errors}")
     
     if "self_kudos" in validation_errors:
         respond(format_error_message("self_kudos"))
@@ -100,16 +93,21 @@ def handle_kudos_command(ack, command, say, respond, app, db_manager):
     if successful_kudos:
         # Send announcement to channel
         announcement = format_kudos_announcement(user_id, successful_kudos, message)
+        logger.info(f"Formatted announcement: {announcement}")
         
         if SLACK_CHANNEL_ID:
+            logger.info(f"Posting to channel: {SLACK_CHANNEL_ID}")
             try:
-                app.client.chat_postMessage(
+                result = app.client.chat_postMessage(
                     channel=SLACK_CHANNEL_ID,
                     text=announcement,
                     unfurl_links=False
                 )
+                logger.info(f"Channel post result: {result}")
             except Exception as e:
                 logger.error(f"Failed to post to channel: {e}")
+        else:
+            logger.warning("SLACK_CHANNEL_ID not set, skipping channel announcement")
         
         # Confirm to user
         confirmation = format_kudos_confirmation(monthly_count, kudos_needed, len(successful_kudos), MONTHLY_QUOTA)
