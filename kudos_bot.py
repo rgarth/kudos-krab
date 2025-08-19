@@ -23,6 +23,19 @@ db_manager = get_db_manager()
 MONTHLY_QUOTA = int(os.environ.get("MONTHLY_QUOTA", "10"))
 SLACK_CHANNEL_ID = os.environ.get("SLACK_CHANNEL_ID")
 
+@app.middleware
+def log_request(logger, body, next):
+    """Log incoming requests for debugging"""
+    logger.info(f"🦀 Incoming request: {body.get('type', 'unknown')}")
+    if body.get('type') == 'url_verification':
+        logger.info(f"🌊 Slack URL verification challenge received: {body.get('challenge', 'no challenge')}")
+    return next()
+
+@app.route("/health")
+def health_check():
+    """Health check endpoint for container orchestration"""
+    return {"status": "healthy", "service": "kudos-krab"}
+
 def extract_user_mentions(text):
     """Extract all user IDs from Slack mention format <@U1234567890> or @username from anywhere in the text"""
     # First try to find Slack mention format <@U1234567890>
@@ -278,4 +291,5 @@ def lambda_handler(event, context):
 
 # For local development
 if __name__ == "__main__":
-    app.start(port=3000) 
+    port = int(os.environ.get("PORT", "3000"))
+    app.start(port=port) 

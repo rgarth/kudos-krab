@@ -23,7 +23,7 @@ RUN useradd --create-home --shell /bin/bash app && \
     chown -R app:app /app
 USER app
 
-# Expose port for local development
+# Expose port (will be overridden by environment variable)
 EXPOSE 3000
 
 # Default command for local development

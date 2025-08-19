@@ -11,6 +11,7 @@ load_dotenv()
 from kudos_bot import app
 
 if __name__ == "__main__":
-    print("🦀 Starting Kudos Krab locally on port 3000...")
-    print("🌊 Make sure your Slack app Request URL is set to: https://your-ngrok-url.ngrok.io/slack/events")
-    app.start(port=3000, path="/slack/events") 
+    port = int(os.environ.get("PORT", "3000"))
+    print(f"🦀 Starting Kudos Krab locally on port {port}...")
+    print(f"🌊 Your Slack app Request URL should be: https://your-domain.com/slack/events")
+    app.start(port=port, path="/slack/events") 
