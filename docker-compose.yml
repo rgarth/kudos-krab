@@ -17,7 +17,7 @@ services:
       - .:/app
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:${PORT:-3000}/health')"]
+      test: ["CMD", "python", "-c", "import socket; socket.socket().connect(('localhost', ${PORT:-3000}))"]
       interval: 30s
       timeout: 10s
       retries: 3

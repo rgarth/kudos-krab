@@ -31,10 +31,7 @@ def log_request(logger, body, next):
         logger.info(f"🌊 Slack URL verification challenge received: {body.get('challenge', 'no challenge')}")
     return next()
 
-@app.route("/health")
-def health_check():
-    """Health check endpoint for container orchestration"""
-    return {"status": "healthy", "service": "kudos-krab"}
+
 
 def extract_user_mentions(text):
     """Extract all user IDs from Slack mention format <@U1234567890> or @username from anywhere in the text"""
