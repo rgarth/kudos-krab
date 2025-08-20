@@ -33,7 +33,6 @@ CREATE TABLE kudos (
     id SERIAL PRIMARY KEY,
     sender VARCHAR(255) NOT NULL,
     receiver VARCHAR(255) NOT NULL,
-    message TEXT NOT NULL,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -42,6 +41,8 @@ CREATE INDEX idx_kudos_sender ON kudos(sender);
 CREATE INDEX idx_kudos_receiver ON kudos(receiver);
 CREATE INDEX idx_kudos_timestamp ON kudos(timestamp);
 ```
+
+**Note:** The `message` column has been removed for privacy reasons. Messages are only used for channel announcements and are not stored in the database.
 
 ## Environment Variables
 

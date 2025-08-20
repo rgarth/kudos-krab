@@ -84,7 +84,7 @@ def handle_kudos_command(command, say, respond, app, db_manager):
     failed_kudos = []
     
     for receiver in unique_users:
-        if db_manager.record_kudos(user_id, receiver, message):
+        if db_manager.record_kudos(user_id, receiver):
             successful_kudos.append(receiver)
         else:
             failed_kudos.append(receiver)

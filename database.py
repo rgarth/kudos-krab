@@ -60,7 +60,6 @@ class DatabaseManager:
             id SERIAL PRIMARY KEY,
             sender VARCHAR(255) NOT NULL,
             receiver VARCHAR(255) NOT NULL,
-            message TEXT NOT NULL,
             timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         
@@ -75,17 +74,17 @@ class DatabaseManager:
                 conn.commit()
                 logger.info("Database tables initialized successfully")
     
-    def record_kudos(self, sender: str, receiver: str, message: str) -> bool:
+    def record_kudos(self, sender: str, receiver: str) -> bool:
         """Record a new kudos entry"""
         sql = """
-        INSERT INTO kudos (sender, receiver, message)
-        VALUES (%s, %s, %s)
+        INSERT INTO kudos (sender, receiver)
+        VALUES (%s, %s)
         """
         
         try:
             with self.get_connection() as conn:
                 with conn.cursor() as cursor:
-                    cursor.execute(sql, (sender, receiver, message))
+                    cursor.execute(sql, (sender, receiver))
                     conn.commit()
                     logger.info(f"Kudos recorded: {sender} -> {receiver}")
                     return True
