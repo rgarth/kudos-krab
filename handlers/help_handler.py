@@ -13,23 +13,9 @@ def show_help_message(respond):
 
 *{personality['help']['commands']}*
 • `/kk leaderboard` - See who's making the biggest splash this month
-• `/kk leaderboard Aug` - See August leaderboard (this year or last)
-• `/kk leaderboard august 2025` - See August 2025 leaderboard
-• `/kk leaderboard 08` - See August leaderboard using month number
+• `/kk leaderboard Aug|08 [2025]` - See August leaderboard (year is optional)
 • `/kk stats` - Check your own kudos journey
 • `/kk help` - Show this help message
-
-*{personality['help']['examples']}*
-• `/kk @alice thanks for the awesome help!`
-• `/kk @bob @charlie you both crushed that project!`
-• `/kk Great work @david on the presentation yesterday`
-• `/kk leaderboard july 2025` - Check July 2025 champions
-
-*{personality['help']['tips']}*
-• Use full month names: `august`, `july`, `december`
-• Use abbreviations: `aug`, `jul`, `dec`
-• Use numbers: `08`, `07`, `12`
-• If no year specified, shows most recent occurrence
 
 {personality['help']['footer']}"""
     respond(help_text)
