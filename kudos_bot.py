@@ -46,7 +46,7 @@ def handle_kudos_command_wrapper(ack, command, say, respond):
         if first_word == "leaderboard":
             # Parse leaderboard parameters
             leaderboard_params = text[len("leaderboard"):].strip()
-            handle_leaderboard_command(respond, db_manager, leaderboard_params)
+            handle_leaderboard_command(respond, db_manager, app, leaderboard_params)
             return
         elif first_word == "stats":
             handle_stats_command(user_id, respond, db_manager)
