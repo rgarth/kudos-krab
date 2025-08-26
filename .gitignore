@@ -61,4 +61,7 @@ logs/
 
 # Database
 *.db
-*.sqlite3 
+*.sqlite3
+
+# Slack app manifests (keep only example files)
+slack-app-manifest.json 
