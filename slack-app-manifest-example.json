@@ -34,15 +34,5 @@
                 "users:read"
             ]
         }
-    },
-    "event_subscriptions": {
-        "request_url": "YOUR_ENDPOINT_URL_HERE",
-        "bot_events": [
-            "app_mention"
-        ]
-    },
-    "interactivity": {
-        "is_enabled": true,
-        "request_url": "YOUR_ENDPOINT_URL_HERE"
     }
 }
