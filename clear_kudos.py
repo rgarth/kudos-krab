@@ -70,7 +70,7 @@ def clear_kudos_before_date(cutoff_date):
         
         # Get items to be deleted for preview
         cursor.execute("""
-            SELECT sender, receiver, message, timestamp 
+            SELECT sender, receiver, timestamp 
             FROM kudos 
             WHERE timestamp < %s
             ORDER BY timestamp DESC
@@ -80,8 +80,8 @@ def clear_kudos_before_date(cutoff_date):
         
         # Show what will be deleted
         print("\n🗑️  Items to be deleted:")
-        for sender, receiver, message, timestamp in items:
-            print(f"   {timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {sender} → {receiver}: {message[:50]}...")
+        for sender, receiver, timestamp in items:
+            print(f"   {timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {sender} → {receiver}")
         
         # Delete the items
         cursor.execute("""
@@ -120,7 +120,7 @@ def clear_kudos_before_timestamp(cutoff_timestamp):
         
         # Get items to be deleted for preview
         cursor.execute("""
-            SELECT sender, receiver, message, timestamp 
+            SELECT sender, receiver, timestamp 
             FROM kudos 
             WHERE timestamp < %s
             ORDER BY timestamp DESC
@@ -130,8 +130,8 @@ def clear_kudos_before_timestamp(cutoff_timestamp):
         
         # Show what will be deleted
         print("\n🗑️  Items to be deleted:")
-        for sender, receiver, message, timestamp in items:
-            print(f"   {timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {sender} → {receiver}: {message[:50]}...")
+        for sender, receiver, timestamp in items:
+            print(f"   {timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {sender} → {receiver}")
         
         # Delete the items
         cursor.execute("""
@@ -157,7 +157,7 @@ def preview_kudos_before_date(cutoff_date):
     
     with get_db_cursor() as cursor:
         cursor.execute("""
-            SELECT sender, receiver, message, timestamp 
+            SELECT sender, receiver, timestamp 
             FROM kudos 
             WHERE timestamp < %s
             ORDER BY timestamp DESC
@@ -170,8 +170,8 @@ def preview_kudos_before_date(cutoff_date):
             return
         
         print(f"📊 Found {len(items)} kudos that would be deleted:\n")
-        for sender, receiver, message, timestamp in items:
-            print(f"📝 {timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {sender} → {receiver}: {message}")
+        for sender, receiver, timestamp in items:
+            print(f"📝 {timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {sender} → {receiver}")
         
         print(f"\n👀 Preview complete! {len(items)} kudos would be deleted before {cutoff_date} 🦀")
 
@@ -190,7 +190,7 @@ def preview_kudos_before_timestamp(cutoff_timestamp):
     
     with get_db_cursor() as cursor:
         cursor.execute("""
-            SELECT sender, receiver, message, timestamp 
+            SELECT sender, receiver, timestamp 
             FROM kudos 
             WHERE timestamp < %s
             ORDER BY timestamp DESC
@@ -203,8 +203,8 @@ def preview_kudos_before_timestamp(cutoff_timestamp):
             return
         
         print(f"📊 Found {len(items)} kudos that would be deleted:\n")
-        for sender, receiver, message, timestamp in items:
-            print(f"📝 {timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {sender} → {receiver}: {message}")
+        for sender, receiver, timestamp in items:
+            print(f"📝 {timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {sender} → {receiver}")
         
         print(f"\n👀 Preview complete! {len(items)} kudos would be deleted before timestamp {cutoff_timestamp} 🦀")
 
