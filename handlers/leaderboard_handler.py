@@ -6,7 +6,7 @@ from utils.message_formatter import format_leaderboard, format_error_message
 logger = logging.getLogger(__name__)
 
 
-def handle_leaderboard_command(respond, db_manager, app, params=""):
+def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=None):
     """Handle leaderboard request with optional month/year parameters"""
     try:
         # Parse month and year from parameters
@@ -14,10 +14,10 @@ def handle_leaderboard_command(respond, db_manager, app, params=""):
         target_month, target_year = get_target_date(month, year)
         
         # Log the parsing results for debugging
-        logger.info(f"Leaderboard request - params: '{params}', parsed: month={month}, year={year}, target: {target_month}/{target_year}")
+        logger.info(f"Leaderboard request - params: '{params}', parsed: month={month}, year={year}, target: {target_month}/{target_year}, channel: {channel_id}")
         
-        # Get leaderboard data
-        leaderboard_data = db_manager.get_monthly_leaderboard(target_month, target_year)
+        # Get leaderboard data for this channel
+        leaderboard_data = db_manager.get_monthly_leaderboard(target_month, target_year, channel_id)
         
         # Filter out users who are no longer in Slack
         filtered_data = filter_active_users(leaderboard_data, app)

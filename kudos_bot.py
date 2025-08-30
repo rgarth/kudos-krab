@@ -40,16 +40,19 @@ def handle_kudos_command_wrapper(ack, command, say, respond):
     user_id = command["user_id"]
     text = command["text"].strip()
     
+    # Get channel_id from command
+    channel_id = command.get("channel_id")
+    
     # Check if it's a dedicated command (first word is a command)
     if text:
         first_word = text.split()[0].lower()
         if first_word == "leaderboard":
             # Parse leaderboard parameters
             leaderboard_params = text[len("leaderboard"):].strip()
-            handle_leaderboard_command(respond, db_manager, app, leaderboard_params)
+            handle_leaderboard_command(respond, db_manager, app, leaderboard_params, channel_id)
             return
         elif first_word == "stats":
-            handle_stats_command(user_id, respond, db_manager)
+            handle_stats_command(user_id, respond, db_manager, channel_id)
             return
         elif first_word == "help":
             show_help_message(respond)

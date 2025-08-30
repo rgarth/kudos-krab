@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from config.settings import MONTHLY_QUOTA, SLACK_CHANNEL_ID, SLACK_BOT_USER_ID
+from config.settings import MONTHLY_QUOTA, SLACK_BOT_USER_ID
 from utils.user_utils import (
     extract_user_mentions, 
     extract_message_text, 
@@ -68,10 +68,13 @@ def handle_kudos_command(command, say, respond, app, db_manager):
         respond(format_error_message("empty_message"))
         return True
     
+    # Get channel_id from command
+    channel_id = command.get("channel_id")
+    
     # Check monthly quota for multiple kudos
     current_month = datetime.now().month
     current_year = datetime.now().year
-    monthly_count = db_manager.get_monthly_kudos_count(user_id, current_month, current_year)
+    monthly_count = db_manager.get_monthly_kudos_count(user_id, current_month, current_year, channel_id)
     kudos_needed = len(unique_users)
     
     if monthly_count + kudos_needed > MONTHLY_QUOTA:
@@ -84,30 +87,27 @@ def handle_kudos_command(command, say, respond, app, db_manager):
     failed_kudos = []
     
     for receiver in unique_users:
-        if db_manager.record_kudos(user_id, receiver):
+        if db_manager.record_kudos(user_id, receiver, channel_id):
             successful_kudos.append(receiver)
         else:
             failed_kudos.append(receiver)
     
     # Send announcements and confirm
     if successful_kudos:
-        # Send announcement to channel
+        # Send announcement to the same channel where the command was issued
         announcement = format_kudos_announcement(user_id, successful_kudos, message)
         logger.info(f"Formatted announcement: {announcement}")
         
-        if SLACK_CHANNEL_ID:
-            logger.info(f"Posting to channel: {SLACK_CHANNEL_ID}")
-            try:
-                result = app.client.chat_postMessage(
-                    channel=SLACK_CHANNEL_ID,
-                    text=announcement,
-                    unfurl_links=False
-                )
-                logger.info(f"Channel post result: {result}")
-            except Exception as e:
-                logger.error(f"Failed to post to channel: {e}")
-        else:
-            logger.warning("SLACK_CHANNEL_ID not set, skipping channel announcement")
+        logger.info(f"Posting to channel: {channel_id}")
+        try:
+            result = app.client.chat_postMessage(
+                channel=channel_id,
+                text=announcement,
+                unfurl_links=False
+            )
+            logger.info(f"Channel post result: {result}")
+        except Exception as e:
+            logger.error(f"Failed to post to channel: {e}")
         
         # Confirm to user
         confirmation = format_kudos_confirmation(monthly_count, kudos_needed, len(successful_kudos), MONTHLY_QUOTA)
