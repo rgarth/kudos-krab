@@ -68,12 +68,27 @@ This guide will walk you through creating and configuring a Slack app for Kudos 
    - For production: Your AWS Lambda endpoint
 4. Click **"Save Changes"**
 
-## Step 7: Get Channel ID for Announcements
+## Step 7: Multi-Channel Support (Optional)
 
-1. In Slack, go to the channel where you want kudos announcements
-2. Right-click the channel name and select **"View channel details"**
-3. Scroll down to find the **Channel ID** (starts with `C`)
-4. Copy this for your `SLACK_CHANNEL_ID` environment variable
+Kudos Krab now supports multiple channels automatically! Each channel operates independently:
+
+- **Channel Isolation**: Kudos given in #general don't affect #engineering
+- **Channel-Specific Leaderboards**: `/kk leaderboard` shows top users for that channel only
+- **Channel-Specific Stats**: `/kk stats` shows your stats for that channel only
+- **Channel-Specific Quotas**: Monthly quota applies per channel (10 kudos per channel)
+- **Automatic Channel Detection**: The bot automatically detects which channel commands are sent from
+
+**No additional setup required** - the bot will work in any channel where it's invited!
+
+### Migration for Existing Data
+
+If you have existing kudos data from before the multi-channel update, run the migration script:
+
+```bash
+python migrate_add_channel_id.py
+```
+
+This will add the `channel_id` column and populate existing records with your default channel ID.
 
 ## Step 8: Get Bot User ID
 
@@ -95,17 +110,17 @@ SLACK_BOT_TOKEN=xoxb-your-bot-token-here
 SLACK_SIGNING_SECRET=your-signing-secret-here
 SLACK_BOT_USER_ID=U1234567890
 
-# From channel details
-SLACK_CHANNEL_ID=C1234567890
-
 # Your Aiven PostgreSQL connection string
 DATABASE_URL=postgresql://username:password@host:port/database
 
-# Optional: customize monthly quota
+# Optional: customize monthly quota per channel
 MONTHLY_QUOTA=10
+
+# Optional: for migrating existing data (only if you have old kudos data)
+SLACK_CHANNEL_ID=C1234567890
 ```
 
-## Step 9: Local Testing with ngrok
+## Step 10: Local Testing with ngrok
 
 1. Install ngrok:
    ```bash
@@ -133,9 +148,9 @@ MONTHLY_QUOTA=10
      - Interactivity & Shortcuts
    - Use: `https://your-ngrok-url.ngrok.io/slack/events`
 
-## Step 10: Test Your Bot
+## Step 11: Test Your Bot
 
-1. In Slack, try the slash command:
+1. In Slack, try the slash command in any channel:
    ```
    /kk @username thanks for the help!
    ```
@@ -145,15 +160,20 @@ MONTHLY_QUOTA=10
    @Kudos Krab
    ```
 
-3. Check the leaderboard:
+3. Check the leaderboard (channel-specific):
    ```
    /kk leaderboard
    ```
 
-4. Check your stats:
+4. Check your stats (channel-specific):
    ```
    /kk stats
    ```
+
+5. Test multi-channel functionality:
+   - Send kudos in #general
+   - Send kudos in #engineering
+   - Check that leaderboards and stats are different in each channel
 
 ## Troubleshooting
 
