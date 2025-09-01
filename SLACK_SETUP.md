@@ -30,7 +30,7 @@ This guide will walk you through creating and configuring a Slack app for Kudos 
    - `chat:write` - Send messages to channels
    - `commands` - Add slash commands
    - `app_mentions:read` - Read mentions of your app
-   - `users:read` - Read user information (required for username lookup)
+
 4. Click **"Install to Workspace"** at the top of the page
 5. After installation, copy the **"Bot User OAuth Token"** (starts with `xoxb-`) - this is your `SLACK_BOT_TOKEN`
 
