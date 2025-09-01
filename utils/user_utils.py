@@ -89,6 +89,10 @@ def convert_usernames_to_user_ids(app, mentioned_users):
                 user_found = True
         
         if not user_found:
+            # Debug: show some usernames that are in the mapping
+            mapping = get_username_mapping(app)
+            sample_usernames = list(mapping.keys())[:10]  # First 10 usernames
+            logger.error(f"Username '{mention}' not found. Sample usernames in workspace: {sample_usernames}")
             raise Exception(f"Could not find user with username @{mention}. Make sure the username is correct and the user is in this workspace.")
     
     return user_ids
