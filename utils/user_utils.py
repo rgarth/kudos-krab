@@ -6,7 +6,8 @@ logger = logging.getLogger(__name__)
 
 # Global cache for username to user ID mapping
 _username_cache = {
-    'mapping': {}  # username -> user_id
+    'mapping': {},  # username -> user_id
+    'display_names': {}  # username -> display_name
 }
 
 def get_username_mapping(app, force_refresh=False):
@@ -25,12 +26,16 @@ def get_username_mapping(app, force_refresh=False):
         
         # Build username -> user_id mapping
         mapping = {}
+        display_names = {}  # For debugging
         for user in users:
             username = user.get("name")
+            display_name = user.get("profile", {}).get("display_name") or user.get("profile", {}).get("real_name", "")
             if username:
                 mapping[username] = user["id"]
+                display_names[username] = display_name
         
         _username_cache['mapping'] = mapping
+        _username_cache['display_names'] = display_names
         logger.info(f"Built and cached username mapping ({len(mapping)} users)")
         return mapping
     except Exception as e:
@@ -89,10 +94,14 @@ def convert_usernames_to_user_ids(app, mentioned_users):
                 user_found = True
         
         if not user_found:
-            # Debug: show some usernames that are in the mapping
+            # Debug: show some usernames and display names that are in the mapping
             mapping = get_username_mapping(app)
+            display_names = _username_cache['display_names']
             sample_usernames = list(mapping.keys())[:10]  # First 10 usernames
+            sample_display_names = {username: display_names.get(username, "N/A") for username in sample_usernames}
+            
             logger.error(f"Username '{mention}' not found. Sample usernames in workspace: {sample_usernames}")
+            logger.error(f"Sample display names: {sample_display_names}")
             raise Exception(f"Could not find user with username @{mention}. Make sure the username is correct and the user is in this workspace.")
     
     return user_ids
