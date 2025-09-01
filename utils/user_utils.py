@@ -1,7 +1,39 @@
 import re
 import logging
+import time
 
 logger = logging.getLogger(__name__)
+
+# Global cache for users to avoid rate limiting
+_user_cache = {
+    'users': None,
+    'last_updated': 0,
+    'cache_duration': 300  # 5 minutes
+}
+
+def get_cached_users(app):
+    """Get users from cache or fetch from API if needed"""
+    global _user_cache
+    
+    current_time = time.time()
+    
+    # Return cached users if still valid
+    if (_user_cache['users'] is not None and 
+        current_time - _user_cache['last_updated'] < _user_cache['cache_duration']):
+        logger.info(f"Using cached users ({len(_user_cache['users'])} users)")
+        return _user_cache['users']
+    
+    # Fetch fresh users from API
+    try:
+        users_response = app.client.users_list()
+        _user_cache['users'] = users_response["members"]
+        _user_cache['last_updated'] = current_time
+        logger.info(f"Fetched and cached {len(_user_cache['users'])} users")
+        return _user_cache['users']
+    except Exception as e:
+        logger.error(f"Failed to fetch users: {e}")
+        # Return old cache if available, otherwise empty list
+        return _user_cache['users'] or []
 
 
 def extract_user_mentions(text):
@@ -32,31 +64,21 @@ def extract_message_text(text):
 def convert_usernames_to_user_ids(app, mentioned_users):
     """Convert usernames to user IDs"""
     user_ids = []
+    
+    # Get cached users to avoid rate limiting
+    users = get_cached_users(app)
+    
     for mention in mentioned_users:
         # Username, need to look up user ID
         user_found = False
         
-        # Method 1: Try users.list to find by username (primary method)
-        try:
-            users_response = app.client.users_list()
-            for user in users_response["members"]:
-                if user.get("name") == mention:
-                    user_ids.append(user["id"])
-                    logger.info(f"Found user {mention} via users.list: {user['id']}")
-                    user_found = True
-                    break
-        except Exception as list_error:
-            logger.error(f"Users list lookup failed for {mention}: {list_error}")
-        
-        # Method 2: Try users.lookupByEmail as fallback (for Enterprise workspaces)
-        if not user_found:
-            try:
-                user_info = app.client.users_lookupByEmail(email=f"{mention}@slack.com")
-                user_ids.append(user_info["user"]["id"])
-                logger.info(f"Found user {mention} via email lookup: {user_info['user']['id']}")
+        # Search in cached users
+        for user in users:
+            if user.get("name") == mention:
+                user_ids.append(user["id"])
+                logger.info(f"Found user {mention} via cached users.list: {user['id']}")
                 user_found = True
-            except Exception as email_error:
-                logger.info(f"Email lookup failed for {mention}: {email_error}")
+                break
         
         if not user_found:
             raise Exception(f"Could not find user with username @{mention}. Make sure the username is correct and the user is in this workspace.")
