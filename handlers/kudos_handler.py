@@ -4,7 +4,6 @@ from config.settings import MONTHLY_QUOTA, SLACK_BOT_USER_ID
 from utils.user_utils import (
     extract_user_mentions, 
     extract_message_text, 
-    convert_usernames_to_user_ids,
     remove_duplicate_users,
     validate_kudos_recipients
 )
