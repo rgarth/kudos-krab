@@ -45,8 +45,8 @@ This guide will walk you through creating and configuring a Slack app for Kudos 
      - For production: Your AWS Lambda endpoint
    - **Short Description**: `Send kudos to team members (supports multiple recipients)`
    - **Usage Hint**: `@user message or @user1 @user2 message`
-4. Click **"Save"**
-5. **Important**: Under the slash command settings, check **"Escape channels, users, and links sent to your app"** - this ensures proper user ID format is sent to the bot
+4. **Important**: Under the slash command settings, check **"Escape channels, users, and links sent to your app"** - this ensures proper user ID format is sent to the bot
+5. Click **"Save"**
 
 ## Step 5: Configure Event Subscriptions
 
