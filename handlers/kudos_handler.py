@@ -22,6 +22,9 @@ def handle_kudos_command(command, say, respond, app, db_manager):
     user_id = command["user_id"]
     text = command["text"].strip()
     
+    # Debug: Log the full command object to see what Slack sends
+    logger.info(f"Full command object: {command}")
+    
     # Parse kudos command: anything else is treated as a kudos message
     if not text:
         respond(format_error_message("no_mentions"))
