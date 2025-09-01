@@ -36,17 +36,24 @@ def filter_active_users(leaderboard_data, app):
         users_response = app.client.users_list()
         active_user_ids = {user['id'] for user in users_response['members'] if not user.get('deleted', False)}
         
+        logger.info(f"Active users count: {len(active_user_ids)}")
+        logger.info(f"Raw leaderboard data - senders: {leaderboard_data['senders']}, receivers: {leaderboard_data['receivers']}")
+        
         # Filter senders
         filtered_senders = []
         for sender, count in leaderboard_data['senders']:
             if sender in active_user_ids:
                 filtered_senders.append((sender, count))
+            else:
+                logger.warning(f"Sender {sender} not found in active users")
         
         # Filter receivers
         filtered_receivers = []
         for receiver, count in leaderboard_data['receivers']:
             if receiver in active_user_ids:
                 filtered_receivers.append((receiver, count))
+            else:
+                logger.warning(f"Receiver {receiver} not found in active users")
         
         logger.info(f"Filtered leaderboard - senders: {len(filtered_senders)}/{len(leaderboard_data['senders'])}, receivers: {len(filtered_receivers)}/{len(leaderboard_data['receivers'])}")
         
