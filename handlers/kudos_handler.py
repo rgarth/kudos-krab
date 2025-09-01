@@ -1,11 +1,12 @@
 import logging
 from datetime import datetime
-from config.settings import MONTHLY_QUOTA, SLACK_BOT_USER_ID
+from config.settings import MONTHLY_QUOTA
 from utils.user_utils import (
     extract_user_mentions, 
     extract_message_text, 
     remove_duplicate_users,
-    validate_kudos_recipients
+    validate_kudos_recipients,
+    get_bot_user_id
 )
 from utils.message_formatter import (
     format_kudos_announcement,
@@ -43,9 +44,10 @@ def handle_kudos_command(command, say, respond, app, db_manager):
     # Remove duplicates while preserving order
     unique_users = remove_duplicate_users(mentioned_users)
     
-    # Validate recipients
-    logger.info(f"Validating recipients - user_id: {user_id}, unique_users: {unique_users}, bot_user_id: {SLACK_BOT_USER_ID}")
-    validation_errors = validate_kudos_recipients(user_id, unique_users, SLACK_BOT_USER_ID)
+    # Get bot user ID and validate recipients
+    bot_user_id = get_bot_user_id(app)
+    logger.info(f"Validating recipients - user_id: {user_id}, unique_users: {unique_users}, bot_user_id: {bot_user_id}")
+    validation_errors = validate_kudos_recipients(user_id, unique_users, bot_user_id)
     logger.info(f"Validation errors: {validation_errors}")
     
     if "self_kudos" in validation_errors:

@@ -11,7 +11,7 @@ services:
       - SLACK_CHANNEL_ID=${SLACK_CHANNEL_ID}
       - DATABASE_URL=${DATABASE_URL}
       - MONTHLY_QUOTA=${MONTHLY_QUOTA:-10}
-      - SLACK_BOT_USER_ID=${SLACK_BOT_USER_ID}
+
       - PORT=${PORT:-3000}
     volumes:
       - .:/app

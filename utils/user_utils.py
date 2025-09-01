@@ -29,6 +29,15 @@ def remove_duplicate_users(user_list):
     return unique_users
 
 
+def get_bot_user_id(app):
+    """Get the bot's own user ID from Slack"""
+    try:
+        auth_response = app.client.auth_test()
+        return auth_response['user_id']
+    except Exception as e:
+        logger.error(f"Failed to get bot user ID: {e}")
+        return None
+
 def validate_kudos_recipients(user_id, unique_users, bot_user_id):
     """Validate kudos recipients and return validation errors"""
     errors = []

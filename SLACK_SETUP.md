@@ -97,7 +97,7 @@ This will add the `channel_id` column and populate existing records with your de
 2. In Slack, **right-click on your bot's name** (in the sidebar or when mentioned)
 3. Select **"View profile"** or **"Get info"**
 4. Look for the **User ID** (starts with `U`)
-5. Copy this ID for your `SLACK_BOT_USER_ID` environment variable
+
 
 ## Step 9: Environment Variables Summary
 
@@ -109,7 +109,7 @@ SLACK_BOT_TOKEN=xoxb-your-bot-token-here
 
 # From Basic Information page  
 SLACK_SIGNING_SECRET=your-signing-secret-here
-SLACK_BOT_USER_ID=U1234567890
+
 
 # Your Aiven PostgreSQL connection string
 DATABASE_URL=postgresql://username:password@host:port/database

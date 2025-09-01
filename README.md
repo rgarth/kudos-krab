@@ -71,7 +71,7 @@ Required variables:
 - `SLACK_SIGNING_SECRET` - Your Slack app signing secret
 - `DATABASE_URL` - PostgreSQL connection string (Aiven format: `postgres://username:password@host:port/database?sslmode=require`)
 - `MONTHLY_QUOTA` - Kudos quota per person per month (default: 10)
-- `SLACK_BOT_USER_ID` - Bot's Slack user ID (found by right-clicking bot in Slack)
+
 
 Optional variables:
 - `SLACK_CHANNEL_ID` - Default channel ID for migration (only needed if migrating existing data)
