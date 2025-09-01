@@ -5,11 +5,11 @@ logger = logging.getLogger(__name__)
 
 
 def extract_user_mentions(text):
-    """Extract all user IDs from Slack mention format <@U1234567890>"""
+    """Extract all user IDs from Slack mention format <@U1234567890> or <@U1234567890|display_name>"""
     logger.info(f"Extracting mentions from text: '{text}'")
     
-    # Find Slack mention format <@U1234567890>
-    matches = re.findall(r'<@([A-Z0-9]+)>', text)
+    # Find Slack mention format <@U1234567890> or <@U1234567890|display_name>
+    matches = re.findall(r'<@([A-Z0-9]+)(?:\|[^>]*)?>', text)
     logger.info(f"Found user IDs: {matches}")
     return matches
 
