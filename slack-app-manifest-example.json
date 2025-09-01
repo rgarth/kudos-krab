@@ -31,7 +31,8 @@
                 "app_mentions:read",
                 "chat:write",
                 "commands",
-                "users:read"
+                "users:read",
+                "users:read.email"
             ]
         }
     }

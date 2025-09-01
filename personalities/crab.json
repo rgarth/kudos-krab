@@ -9,7 +9,7 @@
   },
   "errors": {
     "no_mentions": "HEY THERE, BUD! 🦀 You gotta mention someone with @username to send them some love! 🌊 Don't be shy, dude - spread those good vibes! ✨\n\nTry `/kk help` to see how to use the bot!",
-    "user_not_found": "OOPS, BUDDY! 😅 I couldn't find a user with username @{username}! 🦀 Make sure you're using the correct username, friend! 🌊",
+    "user_not_found": "OOPS, BUDDY! 😅 I couldn't find a user with username @{username}! 🦀\n\nMake sure you're using the correct username, friend! 🌊 In Enterprise workspaces, try using their full email address or check that they're in this workspace.\n\nYou can also try mentioning them directly with @username in your message! ✨",
     "self_kudos": "NICE TRY, BUDDY! 😂 But you can't give yourself kudos, you silly crab! 🦀 Save that self-love for someone else, friend! 🌊✨ Maybe try giving yourself a high-five instead? 🤚",
     "bot_kudos": "AWWW, BUDDY! 🥺 You're trying to give ME kudos? That's so sweet! 🦀 *blushes in crab* 🌊✨ But I'm just here to help spread the love - save those kudos for your amazing teammates! 💕 Maybe try `/kk help` to see how to send kudos to others? 🦀",
     "empty_message": "COME ON, BUD! 🦀 You can't just send empty kudos! 🌊 Add some words to make it special, friend - that's what makes the ocean sparkle! ✨",

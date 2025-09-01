@@ -31,23 +31,45 @@ def convert_usernames_to_user_ids(app, mentioned_users):
     user_ids = []
     for mention in mentioned_users:
         # Username, need to look up user ID
+        user_found = False
+        
+        # Method 1: Try users.lookupByEmail (for Enterprise workspaces)
         try:
-            # Try to get user by username
             user_info = app.client.users_lookupByEmail(email=f"{mention}@slack.com")
             user_ids.append(user_info["user"]["id"])
-        except:
-            # Try alternative lookup methods
+            logger.info(f"Found user {mention} via email lookup: {user_info['user']['id']}")
+            user_found = True
+        except Exception as email_error:
+            logger.info(f"Email lookup failed for {mention}: {email_error}")
+        
+        # Method 2: Try users.list to find by username (fallback method)
+        if not user_found:
             try:
-                # Try users.list to find by username
                 users_response = app.client.users_list()
                 for user in users_response["members"]:
                     if user.get("name") == mention:
                         user_ids.append(user["id"])
+                        logger.info(f"Found user {mention} via users.list: {user['id']}")
+                        user_found = True
                         break
-                else:
-                    raise Exception("User not found")
-            except:
-                raise Exception(f"Could not find user with username @{mention}")
+            except Exception as list_error:
+                logger.error(f"Users list lookup failed for {mention}: {list_error}")
+        
+        # Method 3: Try with different email domains (common Enterprise patterns)
+        if not user_found:
+            common_domains = ["company.com", "enterprise.com", "corp.com", "org.com"]
+            for domain in common_domains:
+                try:
+                    user_info = app.client.users_lookupByEmail(email=f"{mention}@{domain}")
+                    user_ids.append(user_info["user"]["id"])
+                    logger.info(f"Found user {mention} via {domain} lookup: {user_info['user']['id']}")
+                    user_found = True
+                    break
+                except Exception:
+                    continue
+        
+        if not user_found:
+            raise Exception(f"Could not find user with username @{mention}. In Enterprise workspaces, try using their full email address or check that they're in this workspace.")
     
     return user_ids
 
