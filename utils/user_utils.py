@@ -6,21 +6,15 @@ logger = logging.getLogger(__name__)
 
 # Global cache for username to user ID mapping
 _username_cache = {
-    'mapping': {},  # username -> user_id
-    'last_updated': 0,
-    'cache_duration': 300  # 5 minutes
+    'mapping': {}  # username -> user_id
 }
 
 def get_username_mapping(app, force_refresh=False):
     """Get username to user ID mapping from cache or fetch from API if needed"""
     global _username_cache
     
-    current_time = time.time()
-    
-    # Return cached mapping if still valid and not forcing refresh
-    if (not force_refresh and 
-        _username_cache['mapping'] and 
-        current_time - _username_cache['last_updated'] < _username_cache['cache_duration']):
+    # Return cached mapping if available and not forcing refresh
+    if not force_refresh and _username_cache['mapping']:
         logger.info(f"Using cached username mapping ({len(_username_cache['mapping'])} users)")
         return _username_cache['mapping']
     
@@ -37,7 +31,6 @@ def get_username_mapping(app, force_refresh=False):
                 mapping[username] = user["id"]
         
         _username_cache['mapping'] = mapping
-        _username_cache['last_updated'] = current_time
         logger.info(f"Built and cached username mapping ({len(mapping)} users)")
         return mapping
     except Exception as e:
