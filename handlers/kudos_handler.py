@@ -30,27 +30,19 @@ def handle_kudos_command(command, say, respond, app, db_manager):
         respond(format_error_message("no_mentions"))
         return True
     
-    # Extract all mentioned users
+    # Extract all mentioned users (these are already user IDs)
     mentioned_users = extract_user_mentions(text)
     
     # Debug: Log what we received
     logger.info(f"Received text: '{text}'")
-    logger.info(f"Extracted mentions: {mentioned_users}")
+    logger.info(f"Extracted user IDs: {mentioned_users}")
     
     if not mentioned_users:
         respond(format_error_message("no_mentions"))
         return True
     
-    # Convert usernames to user IDs
-    try:
-        user_ids = convert_usernames_to_user_ids(app, mentioned_users)
-    except Exception as e:
-        username = mentioned_users[0] if mentioned_users else "unknown"
-        respond(format_error_message("user_not_found", username=username))
-        return True
-    
     # Remove duplicates while preserving order
-    unique_users = remove_duplicate_users(user_ids)
+    unique_users = remove_duplicate_users(mentioned_users)
     
     # Validate recipients
     logger.info(f"Validating recipients - user_id: {user_id}, unique_users: {unique_users}, bot_user_id: {SLACK_BOT_USER_ID}")

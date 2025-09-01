@@ -1,110 +1,23 @@
 import re
 import logging
-import time
 
 logger = logging.getLogger(__name__)
 
-# Global cache for username to user ID mapping
-_username_cache = {
-    'mapping': {},  # username -> user_id
-    'display_names': {}  # username -> display_name
-}
-
-def get_username_mapping(app, force_refresh=False):
-    """Get username to user ID mapping from cache or fetch from API if needed"""
-    global _username_cache
-    
-    # Return cached mapping if available and not forcing refresh
-    if not force_refresh and _username_cache['mapping']:
-        logger.info(f"Using cached username mapping ({len(_username_cache['mapping'])} users)")
-        return _username_cache['mapping']
-    
-    # Fetch fresh users from API and build mapping
-    try:
-        users_response = app.client.users_list()
-        users = users_response["members"]
-        
-        # Build username -> user_id mapping
-        mapping = {}
-        display_names = {}  # For debugging
-        for user in users:
-            username = user.get("name")
-            display_name = user.get("profile", {}).get("display_name") or user.get("profile", {}).get("real_name", "")
-            if username:
-                mapping[username] = user["id"]
-                display_names[username] = display_name
-        
-        _username_cache['mapping'] = mapping
-        _username_cache['display_names'] = display_names
-        logger.info(f"Built and cached username mapping ({len(mapping)} users)")
-        return mapping
-    except Exception as e:
-        logger.error(f"Failed to fetch users: {e}")
-        # Return old cache if available, otherwise empty dict
-        return _username_cache['mapping'] or {}
-
 
 def extract_user_mentions(text):
-    """Extract all user IDs from Slack mention format <@U1234567890> or @username from anywhere in the text"""
+    """Extract all user IDs from Slack mention format <@U1234567890>"""
     logger.info(f"Extracting mentions from text: '{text}'")
     
-    # First try to find Slack mention format <@U1234567890>
+    # Find Slack mention format <@U1234567890>
     matches = re.findall(r'<@([A-Z0-9]+)>', text)
-    if matches:
-        logger.info(f"Found Slack mention format: {matches}")
-        return matches
-    
-    # If no matches, look for @username format (for slash commands)
-    username_matches = re.findall(r'@([a-zA-Z0-9_]+)', text)
-    # Filter out common Slack keywords
-    filtered_matches = [match for match in username_matches if match.lower() not in ['channel', 'here', 'everyone']]
-    
-    logger.info(f"Found @username format: {filtered_matches}")
-    return filtered_matches
+    logger.info(f"Found user IDs: {matches}")
+    return matches
 
 
 def extract_message_text(text):
     """Extract the message text - keep original message intact"""
     # Just return the original text, don't strip usernames
     return text.strip()
-
-
-def convert_usernames_to_user_ids(app, mentioned_users):
-    """Convert usernames to user IDs"""
-    user_ids = []
-    
-    for mention in mentioned_users:
-        # Username, need to look up user ID
-        user_found = False
-        
-        # Try to find user in cached mapping
-        mapping = get_username_mapping(app)
-        if mention in mapping:
-            user_ids.append(mapping[mention])
-            logger.info(f"Found user {mention} via cached mapping: {mapping[mention]}")
-            user_found = True
-        
-        # If not found, refresh cache and try again
-        if not user_found:
-            logger.info(f"User {mention} not found in cache, refreshing mapping...")
-            mapping = get_username_mapping(app, force_refresh=True)
-            if mention in mapping:
-                user_ids.append(mapping[mention])
-                logger.info(f"Found user {mention} after cache refresh: {mapping[mention]}")
-                user_found = True
-        
-        if not user_found:
-            # Debug: show some usernames and display names that are in the mapping
-            mapping = get_username_mapping(app)
-            display_names = _username_cache['display_names']
-            sample_usernames = list(mapping.keys())[:10]  # First 10 usernames
-            sample_display_names = {username: display_names.get(username, "N/A") for username in sample_usernames}
-            
-            logger.error(f"Username '{mention}' not found. Sample usernames in workspace: {sample_usernames}")
-            logger.error(f"Sample display names: {sample_display_names}")
-            raise Exception(f"Could not find user with username @{mention}. Make sure the username is correct and the user is in this workspace.")
-    
-    return user_ids
 
 
 def remove_duplicate_users(user_list):
