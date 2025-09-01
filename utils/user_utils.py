@@ -4,36 +4,46 @@ import time
 
 logger = logging.getLogger(__name__)
 
-# Global cache for users to avoid rate limiting
-_user_cache = {
-    'users': None,
+# Global cache for username to user ID mapping
+_username_cache = {
+    'mapping': {},  # username -> user_id
     'last_updated': 0,
     'cache_duration': 300  # 5 minutes
 }
 
-def get_cached_users(app):
-    """Get users from cache or fetch from API if needed"""
-    global _user_cache
+def get_username_mapping(app, force_refresh=False):
+    """Get username to user ID mapping from cache or fetch from API if needed"""
+    global _username_cache
     
     current_time = time.time()
     
-    # Return cached users if still valid
-    if (_user_cache['users'] is not None and 
-        current_time - _user_cache['last_updated'] < _user_cache['cache_duration']):
-        logger.info(f"Using cached users ({len(_user_cache['users'])} users)")
-        return _user_cache['users']
+    # Return cached mapping if still valid and not forcing refresh
+    if (not force_refresh and 
+        _username_cache['mapping'] and 
+        current_time - _username_cache['last_updated'] < _username_cache['cache_duration']):
+        logger.info(f"Using cached username mapping ({len(_username_cache['mapping'])} users)")
+        return _username_cache['mapping']
     
-    # Fetch fresh users from API
+    # Fetch fresh users from API and build mapping
     try:
         users_response = app.client.users_list()
-        _user_cache['users'] = users_response["members"]
-        _user_cache['last_updated'] = current_time
-        logger.info(f"Fetched and cached {len(_user_cache['users'])} users")
-        return _user_cache['users']
+        users = users_response["members"]
+        
+        # Build username -> user_id mapping
+        mapping = {}
+        for user in users:
+            username = user.get("name")
+            if username:
+                mapping[username] = user["id"]
+        
+        _username_cache['mapping'] = mapping
+        _username_cache['last_updated'] = current_time
+        logger.info(f"Built and cached username mapping ({len(mapping)} users)")
+        return mapping
     except Exception as e:
         logger.error(f"Failed to fetch users: {e}")
-        # Return old cache if available, otherwise empty list
-        return _user_cache['users'] or []
+        # Return old cache if available, otherwise empty dict
+        return _username_cache['mapping'] or {}
 
 
 def extract_user_mentions(text):
@@ -65,20 +75,25 @@ def convert_usernames_to_user_ids(app, mentioned_users):
     """Convert usernames to user IDs"""
     user_ids = []
     
-    # Get cached users to avoid rate limiting
-    users = get_cached_users(app)
-    
     for mention in mentioned_users:
         # Username, need to look up user ID
         user_found = False
         
-        # Search in cached users
-        for user in users:
-            if user.get("name") == mention:
-                user_ids.append(user["id"])
-                logger.info(f"Found user {mention} via cached users.list: {user['id']}")
+        # Try to find user in cached mapping
+        mapping = get_username_mapping(app)
+        if mention in mapping:
+            user_ids.append(mapping[mention])
+            logger.info(f"Found user {mention} via cached mapping: {mapping[mention]}")
+            user_found = True
+        
+        # If not found, refresh cache and try again
+        if not user_found:
+            logger.info(f"User {mention} not found in cache, refreshing mapping...")
+            mapping = get_username_mapping(app, force_refresh=True)
+            if mention in mapping:
+                user_ids.append(mapping[mention])
+                logger.info(f"Found user {mention} after cache refresh: {mapping[mention]}")
                 user_found = True
-                break
         
         if not user_found:
             raise Exception(f"Could not find user with username @{mention}. Make sure the username is correct and the user is in this workspace.")
