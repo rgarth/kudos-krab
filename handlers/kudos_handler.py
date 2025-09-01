@@ -44,7 +44,7 @@ def handle_kudos_command(command, say, respond, app, db_manager):
     # Remove duplicates while preserving order
     unique_users = remove_duplicate_users(mentioned_users)
     
-    # Get bot user ID and validate recipients
+    # Validate recipients
     bot_user_id = get_bot_user_id(app)
     logger.info(f"Validating recipients - user_id: {user_id}, unique_users: {unique_users}, bot_user_id: {bot_user_id}")
     validation_errors = validate_kudos_recipients(user_id, unique_users, bot_user_id)

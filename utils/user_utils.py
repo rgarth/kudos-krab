@@ -3,6 +3,25 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Cache for bot user ID
+_bot_user_id_cache = None
+
+
+def get_bot_user_id(app):
+    """Get the bot's own user ID from Slack (cached after first call)"""
+    global _bot_user_id_cache
+    
+    if _bot_user_id_cache is None:
+        try:
+            auth_response = app.client.auth_test()
+            _bot_user_id_cache = auth_response['user_id']
+            logger.info(f"🦀 Bot startup - User ID: {_bot_user_id_cache}, Team: {auth_response.get('team', 'N/A')}, Team ID: {auth_response.get('team_id', 'N/A')}")
+        except Exception as e:
+            logger.error(f"Failed to get bot user ID: {e}")
+            _bot_user_id_cache = None
+    
+    return _bot_user_id_cache
+
 
 def extract_user_mentions(text):
     """Extract all user IDs from Slack mention format <@U1234567890> or <@U1234567890|display_name>"""
@@ -28,15 +47,6 @@ def remove_duplicate_users(user_list):
             unique_users.append(user)
     return unique_users
 
-
-def get_bot_user_id(app):
-    """Get the bot's own user ID from Slack"""
-    try:
-        auth_response = app.client.auth_test()
-        return auth_response['user_id']
-    except Exception as e:
-        logger.error(f"Failed to get bot user ID: {e}")
-        return None
 
 def validate_kudos_recipients(user_id, unique_users, bot_user_id):
     """Validate kudos recipients and return validation errors"""
