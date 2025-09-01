@@ -13,7 +13,9 @@ def show_help_message(respond):
 
 *{personality['help']['commands']}*
 • `/kk leaderboard` - See who's making the biggest splash this month
+• `/kk leaderboard public` - Share the leaderboard with the whole channel
 • `/kk leaderboard Aug|08 [2025]` - See August leaderboard (year is optional)
+• `/kk leaderboard Aug|08 [2025] public` - Share August leaderboard publicly
 • `/kk stats` - Check your own kudos journey
 • `/kk help` - Show this help message
 
