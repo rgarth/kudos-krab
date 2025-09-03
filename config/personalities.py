@@ -1,9 +1,7 @@
 import os
 import json
 from pathlib import Path
-
-# Default personality
-DEFAULT_PERSONALITY = "crab"
+from config.settings import DEFAULT_PERSONALITY
 
 def load_personality(personality_name=None):
     """Load personality responses from JSON file"""

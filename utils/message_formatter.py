@@ -7,26 +7,33 @@ def format_leaderboard(leaderboard_data, month, year):
     personality = load_personality()
     month_name = datetime(year, month, 1).strftime("%B %Y")
     
-    # Format top senders
-    senders_text = f"*{personality['leaderboard']['senders_title']}*\n"
-    if leaderboard_data['senders']:
-        for i, (sender, count) in enumerate(leaderboard_data['senders'], 1):
-            senders_text += f"{i}. <@{sender}> - {count} kudos 🌊\n"
-    else:
-        senders_text += f"{personality['leaderboard']['no_senders']}\n"
-    
-    # Format top receivers
-    receivers_text = f"\n*{personality['leaderboard']['receivers_title']}*\n"
+    # Format top receivers (most important - show first)
+    receivers_text = f"*{personality['leaderboard']['receivers_title']}*\n"
     if leaderboard_data['receivers']:
         for i, (receiver, count) in enumerate(leaderboard_data['receivers'], 1):
             receivers_text += f"{i}. <@{receiver}> - {count} kudos 🐚\n"
     else:
         receivers_text += f"{personality['leaderboard']['no_receivers']}\n"
     
+    # Format top senders (simplified - only show top sender(s))
+    senders_text = f"\n*{personality['leaderboard']['senders_title']}*\n"
+    if leaderboard_data['senders']:
+        top_count = leaderboard_data['senders'][0][1]  # Get the highest count
+        top_senders = [sender for sender, count in leaderboard_data['senders'] if count == top_count]
+        
+        if len(top_senders) == 1:
+            senders_text += f"Our top kudos sender is <@{top_senders[0]}> with {top_count} kudos 🌊\n"
+        else:
+            # Multiple senders tied for first place
+            sender_mentions = ", ".join([f"<@{sender}>" for sender in top_senders])
+            senders_text += f"Our top kudos senders are {sender_mentions} with {top_count} kudos each 🌊\n"
+    else:
+        senders_text += f"{personality['leaderboard']['no_senders']}\n"
+    
     title = personality['leaderboard']['title'].format(month_name=month_name)
     footer = personality['leaderboard']['footer']
     
-    return f"*{title}*\n\n{senders_text}{receivers_text}\n\n*{footer}*"
+    return f"*{title}*\n\n{receivers_text}{senders_text}\n\n*{footer}*"
 
 
 def format_kudos_announcement(user_id, successful_kudos, message):
