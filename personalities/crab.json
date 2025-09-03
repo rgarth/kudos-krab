@@ -31,6 +31,9 @@
     "receivers_title": "🌟 TOP KUDOS RECEIVERS 🌟",
     "no_senders": "No kudos sent this month yet! Let's get this party started! 🦀",
     "no_receivers": "No kudos received this month yet! Time to spread some love! 🌊",
+    "top_sender_single": "Our top kudos sender is <@{sender}> with {count} kudos 🌊",
+    "top_sender_multiple": "Our top kudos senders are {senders} with {count} kudos each 🌊",
+    "posted_confirmation": "✅ Leaderboard posted to the channel!",
     "footer": "Keep making those waves! 🌊✨"
   },
   "stats": {

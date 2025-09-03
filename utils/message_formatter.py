@@ -22,11 +22,15 @@ def format_leaderboard(leaderboard_data, month, year):
         top_senders = [sender for sender, count in leaderboard_data['senders'] if count == top_count]
         
         if len(top_senders) == 1:
-            senders_text += f"Our top kudos sender is <@{top_senders[0]}> with {top_count} kudos 🌊\n"
+            senders_text += personality['leaderboard']['top_sender_single'].format(
+                sender=top_senders[0], count=top_count
+            ) + "\n"
         else:
             # Multiple senders tied for first place
             sender_mentions = ", ".join([f"<@{sender}>" for sender in top_senders])
-            senders_text += f"Our top kudos senders are {sender_mentions} with {top_count} kudos each 🌊\n"
+            senders_text += personality['leaderboard']['top_sender_multiple'].format(
+                senders=sender_mentions, count=top_count
+            ) + "\n"
     else:
         senders_text += f"{personality['leaderboard']['no_senders']}\n"
     
