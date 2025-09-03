@@ -72,8 +72,9 @@ Required variables:
 - `DATABASE_URL` - PostgreSQL connection string (Aiven format: `postgres://username:password@host:port/database?sslmode=require`)
 - `MONTHLY_QUOTA` - Kudos quota per person per month (default: 10)
 
-
 Optional variables:
+- `LEADERBOARD_LIMIT` - Number of users to show in leaderboards (default: 10)
+- `BOT_PERSONALITY` - Bot personality to use (default: crab)
 - `SLACK_CHANNEL_ID` - Default channel ID for migration (only needed if migrating existing data)
 
 ## Deployment Options

@@ -117,6 +117,12 @@ DATABASE_URL=postgresql://username:password@host:port/database
 # Optional: customize monthly quota per channel
 MONTHLY_QUOTA=10
 
+# Optional: customize leaderboard size
+LEADERBOARD_LIMIT=10
+
+# Optional: customize bot personality
+BOT_PERSONALITY=crab
+
 # Optional: for migrating existing data (only if you have old kudos data)
 SLACK_CHANNEL_ID=C1234567890
 ```

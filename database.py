@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2 import pool
 from contextlib import contextmanager
 import logging
+from config.settings import LEADERBOARD_LIMIT
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +160,7 @@ class DatabaseManager:
             AND EXTRACT(YEAR FROM timestamp) = %s
             GROUP BY sender 
             ORDER BY count DESC 
-            LIMIT 10
+            LIMIT %s
             """
             
             receiver_sql = """
@@ -170,10 +171,10 @@ class DatabaseManager:
             AND EXTRACT(YEAR FROM timestamp) = %s
             GROUP BY receiver 
             ORDER BY count DESC 
-            LIMIT 10
+            LIMIT %s
             """
             
-            params = (channel_id, month, year)
+            params = (channel_id, month, year, LEADERBOARD_LIMIT)
         else:
             sender_sql = """
             SELECT sender, COUNT(*) as count 
@@ -182,7 +183,7 @@ class DatabaseManager:
             AND EXTRACT(YEAR FROM timestamp) = %s
             GROUP BY sender 
             ORDER BY count DESC 
-            LIMIT 10
+            LIMIT %s
             """
             
             receiver_sql = """
@@ -192,10 +193,10 @@ class DatabaseManager:
             AND EXTRACT(YEAR FROM timestamp) = %s
             GROUP BY receiver 
             ORDER BY count DESC 
-            LIMIT 10
+            LIMIT %s
             """
             
-            params = (month, year)
+            params = (month, year, LEADERBOARD_LIMIT)
         
         with self.get_connection() as conn:
             with conn.cursor() as cursor:
