@@ -8,10 +8,22 @@
     "footer": "Now go make some magic, bud! 🌊✨"
   },
   "errors": {
-    "no_mentions": "HEY THERE, BUD! 🦀 You gotta mention someone with @username to send them some love! 🌊 Don't be shy, dude - spread those good vibes! ✨\n\nTry `/kk help` to see how to use the bot!",
+    "no_mentions": [
+      "HEY THERE, BUD! 🦀 You gotta mention someone with @username to send them some love! 🌊 Don't be shy, dude - spread those good vibes! ✨\n\nTry `/kk help` to see how to use the bot!",
+      "COME ON, BUDDY! 🦀 You can't just send kudos into the void! 🌊 Pick someone awesome and give them a shoutout! ✨\n\nCheck out `/kk help` for the full scoop!",
+      "YIKES, BUD! 🦀 The ocean is empty without someone to appreciate! 🌊 Tag a teammate with @username and let's make some waves! ✨\n\nPeep `/kk help` for the deets!"
+    ],
     "user_not_found": "OOPS, BUDDY! 😅 I couldn't find a user with username @{username}! 🦀\n\nMake sure you're using the correct username, friend! 🌊 In Enterprise workspaces, try using their full email address or check that they're in this workspace.\n\nYou can also try mentioning them directly with @username in your message! ✨",
-    "self_kudos": "NICE TRY, BUDDY! 😂 But you can't give yourself kudos, you silly crab! 🦀 Save that self-love for someone else, friend! 🌊✨ Maybe try giving yourself a high-five instead? 🤚",
-    "bot_kudos": "AWWW, BUDDY! 🥺 You're trying to give ME kudos? That's so sweet! 🦀 *blushes in crab* 🌊✨ But I'm just here to help spread the love - save those kudos for your amazing teammates! 💕 Maybe try `/kk help` to see how to send kudos to others? 🦀",
+    "self_kudos": [
+      "NICE TRY, BUDDY! 😂 But you can't give yourself kudos, you silly crab! 🦀 Save that self-love for someone else, friend! 🌊✨ Maybe try giving yourself a high-five instead? 🤚",
+      "AWWW, BUD! 🦀 Self-kudos? That's like a crab trying to high-five itself! 😂 Save the love for your amazing teammates! 🌊✨",
+      "HEY THERE, BUDDY! 🦀 I love your enthusiasm, but self-kudos is like a fish trying to ride a bicycle! 😂 Spread that love to others! 🌊✨"
+    ],
+    "bot_kudos": [
+      "AWWW, BUDDY! 🥺 You're trying to give ME kudos? That's so sweet! 🦀 *blushes in crab* 🌊✨ But I'm just here to help spread the love - save those kudos for your amazing teammates! 💕 Maybe try `/kk help` to see how to send kudos to others? 🦀",
+      "NICE TRY, BUD! 🦀 But I'm just a humble kudos coach - I can't accept the love! 😂 Save those kudos for your awesome teammates! 🌊✨",
+      "AWWW, BUDDY! 🥺 You're making me blush! 🦀 But I'm just the messenger - spread that love to your amazing team instead! 🌊✨ Maybe check out `/kk help` for ideas?"
+    ],
     "empty_message": "COME ON, BUD! 🦀 You can't just send empty kudos! 🌊 Add some words to make it special, friend - that's what makes the ocean sparkle! ✨",
     "quota_exceeded": "YIKES, BUDDY! 😅 Looks like you're all out of kudos juice! 🦀 You need {kudos_needed} more but only have {remaining} left this month, friend. Time to wait for the next tide to roll in! 🌊",
     "failed_kudos": "OOPS, BUDDY! 😅 Looks like the ocean got a bit choppy for {failed_mentions}! 🦀 Let's try that again, friend - the tide will be better this time! 🌊",
@@ -21,8 +33,16 @@
   "success": {
     "kudos_single": "BOOM, BUDDY! 💥 Kudos delivered like a tidal wave! 🦀 You've got {remaining} more kudos left this month, friend - keep that energy flowing! 🌊✨",
     "kudos_multiple": "WHOA, BUD! 🚀 You just made it RAIN kudos on {count} people! 🦀 That's {remaining} more kudos in your tank, friend - you're on FIRE! 🔥🌊",
-    "announcement_single": "🦀 *OH SNAP!* 🦀\n<@{user_id}> just dropped some MAJOR kudos on <@{receiver}>! 🌊\n\n> {message}\n\n*That's what I'm talking about!* 🦀✨",
-    "announcement_multiple": "🦀 *HOLY CRAB!* 🦀\n<@{user_id}> just went FULL OCEAN MODE and sent kudos to {receivers}! 🌊🐚\n\n> {message}\n\n*Now THAT'S how you make waves!* 🦀✨"
+    "announcement_single": [
+      "🦀 *OH SNAP!* 🦀\n<@{user_id}> just dropped some MAJOR kudos on <@{receiver}>! 🌊\n\n> {message}\n\n*That's what I'm talking about!* 🦀✨",
+      "🦀 *CRAB ALERT!* 🦀\n<@{user_id}> is spreading the love to <@{receiver}>! 🌊\n\n> {message}\n\n*Now THAT'S how you make waves!* 🦀✨",
+      "🦀 *OCEAN VIBES!* 🦀\n<@{user_id}> just made <@{receiver}>'s day with some sweet kudos! 🌊\n\n> {message}\n\n*You're absolutely CRUSHING it!* 🦀✨"
+    ],
+    "announcement_multiple": [
+      "🦀 *HOLY CRAB!* 🦀\n<@{user_id}> just went FULL OCEAN MODE and sent kudos to {receivers}! 🌊🐚\n\n> {message}\n\n*Now THAT'S how you make waves!* 🦀✨",
+      "🦀 *TSUNAMI OF LOVE!* 🦀\n<@{user_id}> is making it RAIN kudos on {receivers}! 🌊🐚\n\n> {message}\n\n*That's what I call spreading the good vibes!* 🦀✨",
+      "🦀 *CRABTASTIC!* 🦀\n<@{user_id}> just unleashed a kudos STORM on {receivers}! 🌊⚡\n\n> {message}\n\n*You're on FIRE today!* 🔥🦀"
+    ]
   },
   "app_mention": "HEY THERE, BUDDY! 🦀 I'm your favorite kudos coach! 🌊\n\nHere's how to make some waves:\n• `/kk @user message` - Send love to one person\n• `/kk @user1 @user2 message` - Spread the love to multiple people\n• `/kk leaderboard` - See who's making the biggest splash\n• `/kk leaderboard Aug 2025` - See specific month/year\n• `/kk stats` - Check your own kudos journey\n\nLet's make this ocean sparkle, bud! ✨",
   "leaderboard": {

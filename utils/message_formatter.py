@@ -1,5 +1,6 @@
 from datetime import datetime
 from config.personalities import load_personality
+import random
 
 
 def format_leaderboard(leaderboard_data, month, year):
@@ -46,10 +47,16 @@ def format_kudos_announcement(user_id, successful_kudos, message):
     
     if len(successful_kudos) == 1:
         template = personality['success']['announcement_single']
+        # Handle both single strings and arrays
+        if isinstance(template, list):
+            template = random.choice(template)
         return template.format(user_id=user_id, receiver=successful_kudos[0], message=message)
     else:
         user_mentions = " ".join([f"<@{user}>" for user in successful_kudos])
         template = personality['success']['announcement_multiple']
+        # Handle both single strings and arrays
+        if isinstance(template, list):
+            template = random.choice(template)
         return template.format(user_id=user_id, receivers=user_mentions, message=message)
 
 
@@ -91,6 +98,9 @@ def format_error_message(error_type, **kwargs):
     
     if error_type in error_messages:
         template = error_messages[error_type]
+        # Handle both single strings and arrays
+        if isinstance(template, list):
+            template = random.choice(template)
         return template.format(**kwargs)
     
     return "Something went wrong, buddy! 🦀"
