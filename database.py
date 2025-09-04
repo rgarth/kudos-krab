@@ -15,7 +15,7 @@ class DatabaseManager:
         self._initialize_pool()
     
     def _initialize_pool(self):
-        """Initialize connection pool with minimal connections for Aiven free tier"""
+        """Initialize connection pool with connection limits suitable for multi-channel usage"""
         try:
             database_url = os.getenv('DATABASE_URL')
             if not database_url:
@@ -27,7 +27,7 @@ class DatabaseManager:
                 # Extract components for better error handling
                 self.connection_pool = pool.SimpleConnectionPool(
                     minconn=1,  # Minimum 1 connection
-                    maxconn=3,  # Maximum 3 connections (leaving 2 for safety)
+                    maxconn=10,  # Maximum 10 connections for multi-channel support
                     dsn=database_url
                 )
                 logger.info("Database connection pool initialized successfully")
