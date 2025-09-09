@@ -103,4 +103,5 @@ def format_error_message(error_type, **kwargs):
             template = random.choice(template)
         return template.format(**kwargs)
     
-    return "Something went wrong, buddy! 🦀"
+    # Fallback to a generic error message from personality
+    return personality['errors']['database_error']
