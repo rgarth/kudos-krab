@@ -28,7 +28,8 @@
     "quota_exceeded": "YIKES, BUDDY! 😅 Looks like you're all out of kudos juice! 🦀 You need {kudos_needed} more but only have {remaining} left this month, friend. Time to wait for the next tide to roll in! 🌊",
     "failed_kudos": "OOPS, BUDDY! 😅 Looks like the ocean got a bit choppy for {failed_mentions}! 🦀 Let's try that again, friend - the tide will be better this time! 🌊",
     "database_error": "YIKES, BUDDY! 😅 The ocean got a bit rough while I was checking the leaderboard! 🦀 Let's try that again, friend - the waves should be calmer now! 🌊",
-    "stats_error": "OOPS, BUDDY! 😅 The ocean got a bit murky while I was checking your stats! 🦀 Let's try that again, friend - the water should be clearer now! 🌊"
+    "stats_error": "OOPS, BUDDY! 😅 The ocean got a bit murky while I was checking your stats! 🦀 Let's try that again, friend - the water should be clearer now! 🌊",
+    "generic_error": "OOPS, BUDDY! 😅 Something went a bit sideways in the ocean! 🦀 Let's try that again, friend - the waves should be smoother now! 🌊"
   },
   "success": {
     "kudos_single": "BOOM, BUDDY! 💥 Kudos delivered like a tidal wave! 🦀 You've got {remaining} more kudos left this month, friend - keep that energy flowing! 🌊✨",

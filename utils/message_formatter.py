@@ -104,4 +104,4 @@ def format_error_message(error_type, **kwargs):
         return template.format(**kwargs)
     
     # Fallback to a generic error message from personality
-    return personality['errors']['database_error']
+    return personality['errors']['generic_error']
