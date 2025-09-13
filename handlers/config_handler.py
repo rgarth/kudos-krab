@@ -185,7 +185,8 @@ def handle_config_modal_submission(ack, body, client, db_manager):
     )
     
     if success:
-        # Send confirmation message
+        # Send private confirmation message to user
+        user_id = body['user']['id']
         personality_name = personality or "default"
         quota_text = f"{quota}" if quota else "default"
         leaderboard_text = f"<#{leaderboard_channel}>" if leaderboard_channel else "this channel"
@@ -198,14 +199,17 @@ def handle_config_modal_submission(ack, body, client, db_manager):
 
 Settings will take effect immediately! 🦀"""
         
-        client.chat_postMessage(
+        client.chat_postEphemeral(
             channel=channel_id,
+            user=user_id,
             text=message
         )
     else:
-        # Send error message
-        client.chat_postMessage(
+        # Send private error message to user
+        user_id = body['user']['id']
+        client.chat_postEphemeral(
             channel=channel_id,
+            user=user_id,
             text="❌ Failed to save configuration. Please try again."
         )
 
