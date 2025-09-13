@@ -1,11 +1,14 @@
 from datetime import datetime
-from config.personalities import load_personality
+from config.personalities import load_personality, load_personality_for_channel
 import random
 
 
-def format_leaderboard(leaderboard_data, month, year):
+def format_leaderboard(leaderboard_data, month, year, channel_id=None, db_manager=None):
     """Format leaderboard data for Slack message"""
-    personality = load_personality()
+    if channel_id and db_manager:
+        personality = load_personality_for_channel(channel_id, db_manager)
+    else:
+        personality = load_personality()
     month_name = datetime(year, month, 1).strftime("%B %Y")
     
     # Format top receivers (most important - show first)
@@ -41,9 +44,12 @@ def format_leaderboard(leaderboard_data, month, year):
     return f"*{title}*\n\n{receivers_text}{senders_text}\n\n*{footer}*"
 
 
-def format_kudos_announcement(user_id, successful_kudos, message):
+def format_kudos_announcement(user_id, successful_kudos, message, channel_id=None, db_manager=None):
     """Format kudos announcement message"""
-    personality = load_personality()
+    if channel_id and db_manager:
+        personality = load_personality_for_channel(channel_id, db_manager)
+    else:
+        personality = load_personality()
     
     if len(successful_kudos) == 1:
         template = personality['success']['announcement_single']
@@ -60,9 +66,12 @@ def format_kudos_announcement(user_id, successful_kudos, message):
         return template.format(user_id=user_id, receivers=user_mentions, message=message)
 
 
-def format_kudos_confirmation(monthly_count, kudos_needed, successful_count, monthly_quota):
+def format_kudos_confirmation(monthly_count, kudos_needed, successful_count, monthly_quota, channel_id=None, db_manager=None):
     """Format kudos confirmation message"""
-    personality = load_personality()
+    if channel_id and db_manager:
+        personality = load_personality_for_channel(channel_id, db_manager)
+    else:
+        personality = load_personality()
     remaining = monthly_quota - monthly_count - successful_count
     
     if successful_count == 1:
@@ -73,9 +82,12 @@ def format_kudos_confirmation(monthly_count, kudos_needed, successful_count, mon
         return template.format(count=successful_count, remaining=remaining)
 
 
-def format_stats_message(user_id, monthly_sent, monthly_received, monthly_quota, total_sent, total_received):
+def format_stats_message(user_id, monthly_sent, monthly_received, monthly_quota, total_sent, total_received, channel_id=None, db_manager=None):
     """Format user stats message"""
-    personality = load_personality()
+    if channel_id and db_manager:
+        personality = load_personality_for_channel(channel_id, db_manager)
+    else:
+        personality = load_personality()
     
     return f"""{personality['stats']['title']}
 
@@ -91,9 +103,12 @@ def format_stats_message(user_id, monthly_sent, monthly_received, monthly_quota,
 *{personality['stats']['footer']}*"""
 
 
-def format_error_message(error_type, **kwargs):
+def format_error_message(error_type, channel_id=None, db_manager=None, **kwargs):
     """Format error messages"""
-    personality = load_personality()
+    if channel_id and db_manager:
+        personality = load_personality_for_channel(channel_id, db_manager)
+    else:
+        personality = load_personality()
     error_messages = personality['errors']
     
     if error_type in error_messages:

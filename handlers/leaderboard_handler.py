@@ -26,11 +26,14 @@ def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=N
         # Log the parsing results for debugging
         logger.info(f"Leaderboard request - params: '{params}', parsed: month={month}, year={year}, target: {target_month}/{target_year}, channel: {channel_id}, public: {is_public}")
         
-        # Get leaderboard data for this channel
-        leaderboard_data = db_manager.get_monthly_leaderboard(target_month, target_year, channel_id)
+        # Get effective leaderboard channel (handles channel overrides)
+        effective_channel_id = db_manager.get_effective_leaderboard_channel(channel_id)
+        
+        # Get leaderboard data for the effective channel
+        leaderboard_data = db_manager.get_monthly_leaderboard(target_month, target_year, effective_channel_id)
         
         # Use the data directly - trust the user IDs in the database
-        formatted_leaderboard = format_leaderboard(leaderboard_data, target_month, target_year)
+        formatted_leaderboard = format_leaderboard(leaderboard_data, target_month, target_year, channel_id, db_manager)
         
         if is_public and say and channel_id:
             # Post to channel publicly
@@ -44,7 +47,7 @@ def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=N
             
     except Exception as e:
         logger.error(f"Error getting leaderboard: {e}")
-        respond(format_error_message("database_error"))
+        respond(format_error_message("database_error", channel_id, db_manager))
 
 
 

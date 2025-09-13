@@ -21,13 +21,14 @@ def handle_kudos_command(command, say, respond, app, db_manager):
     """Handle the /kk slash command"""
     user_id = command["user_id"]
     text = command["text"].strip()
+    channel_id = command.get("channel_id")
     
     # Debug: Log the full command object to see what Slack sends
     logger.info(f"Full command object: {command}")
     
     # Parse kudos command: anything else is treated as a kudos message
     if not text:
-        respond(format_error_message("no_mentions"))
+        respond(format_error_message("no_mentions", channel_id, db_manager))
         return True
     
     # Extract all mentioned users (these are already user IDs)
@@ -38,7 +39,7 @@ def handle_kudos_command(command, say, respond, app, db_manager):
     logger.info(f"Extracted user IDs: {mentioned_users}")
     
     if not mentioned_users:
-        respond(format_error_message("no_mentions"))
+        respond(format_error_message("no_mentions", channel_id, db_manager))
         return True
     
     # Remove duplicates while preserving order
@@ -51,21 +52,18 @@ def handle_kudos_command(command, say, respond, app, db_manager):
     logger.info(f"Validation errors: {validation_errors}")
     
     if "self_kudos" in validation_errors:
-        respond(format_error_message("self_kudos"))
+        respond(format_error_message("self_kudos", channel_id, db_manager))
         return True
     
     if "bot_kudos" in validation_errors:
-        respond(format_error_message("bot_kudos"))
+        respond(format_error_message("bot_kudos", channel_id, db_manager))
         return True
     
     # Extract message
     message = extract_message_text(text)
     if not message:
-        respond(format_error_message("empty_message"))
+        respond(format_error_message("empty_message", channel_id, db_manager))
         return True
-    
-    # Get channel_id from command
-    channel_id = command.get("channel_id")
     
     # Check monthly quota for multiple kudos
     current_month = datetime.now().month
@@ -73,9 +71,13 @@ def handle_kudos_command(command, say, respond, app, db_manager):
     monthly_count = db_manager.get_monthly_kudos_count(user_id, current_month, current_year, channel_id)
     kudos_needed = len(unique_users)
     
-    if monthly_count + kudos_needed > MONTHLY_QUOTA:
-        remaining = MONTHLY_QUOTA - monthly_count
-        respond(format_error_message("quota_exceeded", kudos_needed=kudos_needed, remaining=remaining))
+    # Get channel-specific quota
+    config = db_manager.get_channel_config(channel_id)
+    monthly_quota = config['monthly_quota'] if config and config['monthly_quota'] else MONTHLY_QUOTA
+    
+    if monthly_count + kudos_needed > monthly_quota:
+        remaining = monthly_quota - monthly_count
+        respond(format_error_message("quota_exceeded", channel_id, db_manager, kudos_needed=kudos_needed, remaining=remaining))
         return True
     
     # Record kudos for each user
@@ -91,7 +93,7 @@ def handle_kudos_command(command, say, respond, app, db_manager):
     # Send announcements and confirm
     if successful_kudos:
         # Send announcement to the same channel where the command was issued
-        announcement = format_kudos_announcement(user_id, successful_kudos, message)
+        announcement = format_kudos_announcement(user_id, successful_kudos, message, channel_id, db_manager)
         logger.info(f"Formatted announcement: {announcement}")
         
         logger.info(f"Posting to channel: {channel_id}")
@@ -106,11 +108,11 @@ def handle_kudos_command(command, say, respond, app, db_manager):
             logger.error(f"Failed to post to channel: {e}")
         
         # Confirm to user
-        confirmation = format_kudos_confirmation(monthly_count, kudos_needed, len(successful_kudos), MONTHLY_QUOTA)
+        confirmation = format_kudos_confirmation(monthly_count, kudos_needed, len(successful_kudos), monthly_quota, channel_id, db_manager)
         respond(confirmation)
     
     if failed_kudos:
         failed_mentions = " ".join([f"<@{user}>" for user in failed_kudos])
-        respond(format_error_message("failed_kudos", failed_mentions=failed_mentions))
+        respond(format_error_message("failed_kudos", channel_id, db_manager, failed_mentions=failed_mentions))
     
     return True

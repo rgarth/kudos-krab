@@ -1,0 +1,230 @@
+import logging
+from config.personalities import get_available_personalities, load_personality_for_channel
+from config.settings import MONTHLY_QUOTA
+
+logger = logging.getLogger(__name__)
+
+def handle_config_command(ack, command, client, db_manager):
+    """Handle the /kk config command to open configuration modal"""
+    ack()
+    
+    channel_id = command.get('channel_id')
+    user_id = command.get('user_id')
+    trigger_id = command.get('trigger_id')
+    
+    # Get current channel configuration
+    current_config = db_manager.get_channel_config(channel_id)
+    
+    # Get available personalities
+    available_personalities = get_available_personalities()
+    
+    # Build personality options for dropdown
+    personality_options = []
+    for personality in available_personalities:
+        personality_options.append({
+            "text": {
+                "type": "plain_text",
+                "text": personality.title()
+            },
+            "value": personality
+        })
+    
+    # Set current values
+    current_personality = current_config['personality_name'] if current_config else None
+    current_quota = current_config['monthly_quota'] if current_config else MONTHLY_QUOTA
+    current_leaderboard = current_config['leaderboard_channel_id'] if current_config else ""
+    
+    # Create the modal
+    modal = {
+        "type": "modal",
+        "callback_id": "config_modal",
+        "title": {
+            "type": "plain_text",
+            "text": "Kudos Bot Configuration"
+        },
+        "submit": {
+            "type": "plain_text",
+            "text": "Save"
+        },
+        "close": {
+            "type": "plain_text",
+            "text": "Cancel"
+        },
+        "blocks": [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"Configure kudos settings for <#{channel_id}>"
+                }
+            },
+            {
+                "type": "divider"
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Personality*"
+                },
+                "accessory": {
+                    "type": "static_select",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "Select personality"
+                    },
+                    "options": personality_options,
+                    "action_id": "personality_select",
+                    "initial_option": next(
+                        (opt for opt in personality_options if opt["value"] == current_personality),
+                        personality_options[0] if personality_options else None
+                    )
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Monthly Quota*"
+                },
+                "accessory": {
+                    "type": "plain_text_input",
+                    "action_id": "quota_input",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "Enter monthly quota"
+                    },
+                    "initial_value": str(current_quota)
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Leaderboard Channel Override*\n_Optional: Use another channel's leaderboard_"
+                },
+                "accessory": {
+                    "type": "plain_text_input",
+                    "action_id": "leaderboard_input",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "Channel ID (e.g., C1234567890)"
+                    },
+                    "initial_value": current_leaderboard
+                }
+            },
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "mrkdwn",
+                        "text": "💡 Leave empty to use this channel's leaderboard"
+                    }
+                ]
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*How to find a Channel ID:*\n• Right-click on a channel name → 'Copy link'\n• The ID is the part after `/archives/` (starts with C)\n• Or use the channel picker in Slack and copy the ID from the URL\n\n*Example:* If the channel link is `https://workspace.slack.com/archives/C1234567890`, use `C1234567890`"
+                }
+            }
+        ]
+    }
+    
+    # Add channel_id to private metadata for the modal submission
+    modal["private_metadata"] = channel_id
+    
+    try:
+        client.views_open(
+            trigger_id=trigger_id,
+            view=modal
+        )
+    except Exception as e:
+        logger.error(f"Failed to open config modal: {e}")
+
+def handle_config_modal_submission(ack, body, client, db_manager):
+    """Handle configuration modal submission"""
+    ack()
+    
+    channel_id = body['view']['private_metadata']
+    values = body['view']['state']['values']
+    
+    # Extract values from the modal
+    personality = None
+    quota = None
+    leaderboard_channel = None
+    
+    # Get personality selection - need to find the block with the select
+    for block_id, block_values in values.items():
+        if 'personality_select' in block_values:
+            personality = block_values['personality_select']['selected_option']['value']
+        elif 'quota_input' in block_values:
+            try:
+                quota = int(block_values['quota_input']['value'])
+            except (ValueError, KeyError):
+                quota = None
+        elif 'leaderboard_input' in block_values:
+            leaderboard_channel = block_values['leaderboard_input']['value'].strip()
+            if not leaderboard_channel:
+                leaderboard_channel = None
+    
+    # Save configuration
+    success = db_manager.save_channel_config(
+        channel_id=channel_id,
+        personality_name=personality,
+        monthly_quota=quota,
+        leaderboard_channel_id=leaderboard_channel
+    )
+    
+    if success:
+        # Send confirmation message
+        personality_name = personality or "default"
+        quota_text = f"{quota}" if quota else "default"
+        leaderboard_text = f"<#{leaderboard_channel}>" if leaderboard_channel else "this channel"
+        
+        message = f"""✅ *Configuration saved for <#{channel_id}>*
+
+• **Personality:** {personality_name.title()}
+• **Monthly Quota:** {quota_text}
+• **Leaderboard:** {leaderboard_text}
+
+Settings will take effect immediately! 🦀"""
+        
+        client.chat_postMessage(
+            channel=channel_id,
+            text=message
+        )
+    else:
+        # Send error message
+        client.chat_postMessage(
+            channel=channel_id,
+            text="❌ Failed to save configuration. Please try again."
+        )
+
+def show_current_config(respond, channel_id, db_manager):
+    """Show current channel configuration"""
+    config = db_manager.get_channel_config(channel_id)
+    
+    if not config:
+        respond("No custom configuration set for this channel. Using default settings.")
+        return
+    
+    personality_name = config['personality_name'] or "default"
+    quota = config['monthly_quota'] or "default"
+    leaderboard_channel = config['leaderboard_channel_id'] or "this channel"
+    
+    if leaderboard_channel != "this channel":
+        leaderboard_text = f"<#{leaderboard_channel}>"
+    else:
+        leaderboard_text = leaderboard_channel
+    
+    message = f"""📋 *Current Configuration for <#{channel_id}>*
+
+• **Personality:** {personality_name.title()}
+• **Monthly Quota:** {quota}
+• **Leaderboard:** {leaderboard_text}
+
+Use `/kk config` to modify these settings."""
+    
+    respond(message)

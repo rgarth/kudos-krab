@@ -3,6 +3,19 @@ import json
 from pathlib import Path
 from config.settings import DEFAULT_PERSONALITY
 
+def get_available_personalities():
+    """Get list of available personality names from JSON files"""
+    personality_dir = Path(__file__).parent.parent / "personalities"
+    personalities = []
+    
+    if personality_dir.exists():
+        for file_path in personality_dir.glob("*.json"):
+            if file_path.name != "README.md":  # Skip README
+                personality_name = file_path.stem
+                personalities.append(personality_name)
+    
+    return sorted(personalities)
+
 def load_personality(personality_name=None):
     """Load personality responses from JSON file"""
     if personality_name is None:
@@ -25,3 +38,18 @@ def load_personality(personality_name=None):
             return json.load(f)
     except Exception as e:
         raise RuntimeError(f"Error loading personality {personality_name}: {e}")
+
+def load_personality_for_channel(channel_id, db_manager):
+    """Load personality for a specific channel, falling back to default if not configured"""
+    try:
+        config = db_manager.get_channel_config(channel_id)
+        if config and config['personality_name']:
+            return load_personality(config['personality_name'])
+    except Exception as e:
+        # Log error but don't fail - fall back to default
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Failed to load channel-specific personality for {channel_id}: {e}")
+    
+    # Fall back to default personality
+    return load_personality()

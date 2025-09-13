@@ -8,6 +8,7 @@ from handlers.help_handler import show_help_message, get_app_mention_message
 from handlers.leaderboard_handler import handle_leaderboard_command
 from handlers.stats_handler import handle_stats_command
 from handlers.kudos_handler import handle_kudos_command
+from handlers.config_handler import handle_config_command, handle_config_modal_submission, show_current_config
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -55,11 +56,23 @@ def handle_kudos_command_wrapper(ack, command, say, respond):
             handle_stats_command(user_id, respond, db_manager, channel_id)
             return
         elif first_word == "help":
-            show_help_message(respond)
+            show_help_message(respond, channel_id, db_manager)
+            return
+        elif first_word == "config":
+            # Handle config command - show current config or open modal
+            if len(text.split()) == 1:
+                # Just "/kk config" - show current configuration
+                show_current_config(respond, channel_id, db_manager)
+            elif text.split()[1].lower() == "edit":
+                # "/kk config edit" - open configuration modal
+                handle_config_command(ack, command, app.client, db_manager)
+            else:
+                # "/kk config" with other parameters - show current configuration
+                show_current_config(respond, channel_id, db_manager)
             return
         elif len(text.split()) == 1:
             # Single word that's not a recognized command - show help
-            show_help_message(respond)
+            show_help_message(respond, channel_id, db_manager)
             return
     
     # Handle kudos command
@@ -69,7 +82,14 @@ def handle_kudos_command_wrapper(ack, command, say, respond):
 @app.event("app_mention")
 def handle_app_mention(event, say):
     """Handle when the bot is mentioned"""
-    say(get_app_mention_message())
+    channel_id = event.get('channel')
+    say(get_app_mention_message(channel_id, db_manager))
+
+
+@app.view("config_modal")
+def handle_config_modal_submission_wrapper(ack, body, client):
+    """Handle configuration modal submission"""
+    handle_config_modal_submission(ack, body, client, db_manager)
 
 
 # AWS Lambda handler

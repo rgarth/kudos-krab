@@ -55,7 +55,7 @@ class DatabaseManager:
                 self.connection_pool.putconn(conn)
     
     def initialize_tables(self):
-        """Create the kudos table if it doesn't exist"""
+        """Create the kudos and channel_configs tables if they don't exist"""
         create_table_sql = """
         CREATE TABLE IF NOT EXISTS kudos (
             id SERIAL PRIMARY KEY,
@@ -65,12 +65,22 @@ class DatabaseManager:
             timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         
+        CREATE TABLE IF NOT EXISTS channel_configs (
+            channel_id VARCHAR(255) PRIMARY KEY,
+            personality_name VARCHAR(255),
+            monthly_quota INTEGER,
+            leaderboard_channel_id VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        
         CREATE INDEX IF NOT EXISTS idx_kudos_sender ON kudos(sender);
         CREATE INDEX IF NOT EXISTS idx_kudos_receiver ON kudos(receiver);
         CREATE INDEX IF NOT EXISTS idx_kudos_timestamp ON kudos(timestamp);
         CREATE INDEX IF NOT EXISTS idx_kudos_channel ON kudos(channel_id);
         CREATE INDEX IF NOT EXISTS idx_kudos_sender_channel ON kudos(sender, channel_id);
         CREATE INDEX IF NOT EXISTS idx_kudos_receiver_channel ON kudos(receiver, channel_id);
+        CREATE INDEX IF NOT EXISTS idx_channel_configs_leaderboard ON channel_configs(leaderboard_channel_id);
         """
         
         with self.get_connection() as conn:
@@ -267,6 +277,71 @@ class DatabaseManager:
                     'total_received': total_received,
                     'monthly_sent': monthly_sent
                 }
+    
+    def get_channel_config(self, channel_id: str):
+        """Get configuration for a specific channel"""
+        sql = """
+        SELECT personality_name, monthly_quota, leaderboard_channel_id, created_at, updated_at
+        FROM channel_configs 
+        WHERE channel_id = %s
+        """
+        
+        with self.get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(sql, (channel_id,))
+                result = cursor.fetchone()
+                if result:
+                    return {
+                        'personality_name': result[0],
+                        'monthly_quota': result[1],
+                        'leaderboard_channel_id': result[2],
+                        'created_at': result[3],
+                        'updated_at': result[4]
+                    }
+                return None
+    
+    def save_channel_config(self, channel_id: str, personality_name: str = None, 
+                           monthly_quota: int = None, leaderboard_channel_id: str = None):
+        """Save or update channel configuration"""
+        # First check if config exists
+        existing = self.get_channel_config(channel_id)
+        
+        if existing:
+            # Update existing config
+            sql = """
+            UPDATE channel_configs 
+            SET personality_name = COALESCE(%s, personality_name),
+                monthly_quota = COALESCE(%s, monthly_quota),
+                leaderboard_channel_id = COALESCE(%s, leaderboard_channel_id),
+                updated_at = CURRENT_TIMESTAMP
+            WHERE channel_id = %s
+            """
+            params = (personality_name, monthly_quota, leaderboard_channel_id, channel_id)
+        else:
+            # Insert new config
+            sql = """
+            INSERT INTO channel_configs (channel_id, personality_name, monthly_quota, leaderboard_channel_id)
+            VALUES (%s, %s, %s, %s)
+            """
+            params = (channel_id, personality_name, monthly_quota, leaderboard_channel_id)
+        
+        try:
+            with self.get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(sql, params)
+                    conn.commit()
+                    logger.info(f"Channel config saved for {channel_id}: personality={personality_name}, quota={monthly_quota}, leaderboard={leaderboard_channel_id}")
+                    return True
+        except Exception as e:
+            logger.error(f"Failed to save channel config: {e}")
+            return False
+    
+    def get_effective_leaderboard_channel(self, channel_id: str):
+        """Get the effective leaderboard channel for a given channel (handles overrides)"""
+        config = self.get_channel_config(channel_id)
+        if config and config['leaderboard_channel_id']:
+            return config['leaderboard_channel_id']
+        return channel_id
     
     def close(self):
         """Close the connection pool"""
