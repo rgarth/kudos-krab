@@ -236,6 +236,20 @@ def show_current_config(respond, channel_id, db_manager):
 • **Monthly Quota:** {quota}
 • **Leaderboard:** {leaderboard_text}
 
-Use `/kk config` to modify these settings."""
+Use `/kk config edit` to modify these settings."""
     
     respond(message)
+
+def reset_config_to_defaults(respond, channel_id, db_manager):
+    """Reset channel configuration to defaults by deleting the config"""
+    try:
+        # Delete the channel configuration to reset to defaults
+        success = db_manager.delete_channel_config(channel_id)
+        
+        if success:
+            respond("✅ Configuration reset to defaults for this channel. Using global settings.")
+        else:
+            respond("❌ Failed to reset configuration. Please try again.")
+    except Exception as e:
+        logger.error(f"Error resetting config for {channel_id}: {e}")
+        respond("❌ Failed to reset configuration. Please try again.")

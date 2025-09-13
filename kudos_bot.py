@@ -8,7 +8,7 @@ from handlers.help_handler import show_help_message, get_app_mention_message
 from handlers.leaderboard_handler import handle_leaderboard_command
 from handlers.stats_handler import handle_stats_command
 from handlers.kudos_handler import handle_kudos_command
-from handlers.config_handler import handle_config_command, handle_config_modal_submission, show_current_config
+from handlers.config_handler import handle_config_command, handle_config_modal_submission, show_current_config, reset_config_to_defaults
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -66,6 +66,9 @@ def handle_kudos_command_wrapper(ack, command, say, respond):
             elif text.split()[1].lower() == "edit":
                 # "/kk config edit" - open configuration modal
                 handle_config_command(ack, command, app.client, db_manager)
+            elif text.split()[1].lower() == "default":
+                # "/kk config default" - reset to defaults
+                reset_config_to_defaults(respond, channel_id, db_manager)
             else:
                 # "/kk config" with other parameters - show current configuration
                 show_current_config(respond, channel_id, db_manager)

@@ -20,6 +20,7 @@ def show_help_message(respond, channel_id=None, db_manager=None):
 • `/kk stats` - Check your own kudos journey
 • `/kk config` - Show current channel configuration
 • `/kk config edit` - Configure channel settings (personality, quota, leaderboard)
+• `/kk config default` - Reset channel to default settings
 • `/kk help` - Show this help message
 
 {personality['help']['footer']}"""

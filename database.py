@@ -302,28 +302,18 @@ class DatabaseManager:
     
     def save_channel_config(self, channel_id: str, personality_name: str = None, 
                            monthly_quota: int = None, leaderboard_channel_id: str = None):
-        """Save or update channel configuration"""
-        # First check if config exists
-        existing = self.get_channel_config(channel_id)
-        
-        if existing:
-            # Update existing config
-            sql = """
-            UPDATE channel_configs 
-            SET personality_name = COALESCE(%s, personality_name),
-                monthly_quota = COALESCE(%s, monthly_quota),
-                leaderboard_channel_id = COALESCE(%s, leaderboard_channel_id),
-                updated_at = CURRENT_TIMESTAMP
-            WHERE channel_id = %s
-            """
-            params = (personality_name, monthly_quota, leaderboard_channel_id, channel_id)
-        else:
-            # Insert new config
-            sql = """
-            INSERT INTO channel_configs (channel_id, personality_name, monthly_quota, leaderboard_channel_id)
-            VALUES (%s, %s, %s, %s)
-            """
-            params = (channel_id, personality_name, monthly_quota, leaderboard_channel_id)
+        """Save or update channel configuration using UPSERT"""
+        sql = """
+        INSERT INTO channel_configs (channel_id, personality_name, monthly_quota, leaderboard_channel_id, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        ON CONFLICT (channel_id) 
+        DO UPDATE SET 
+            personality_name = COALESCE(EXCLUDED.personality_name, channel_configs.personality_name),
+            monthly_quota = COALESCE(EXCLUDED.monthly_quota, channel_configs.monthly_quota),
+            leaderboard_channel_id = COALESCE(EXCLUDED.leaderboard_channel_id, channel_configs.leaderboard_channel_id),
+            updated_at = CURRENT_TIMESTAMP
+        """
+        params = (channel_id, personality_name, monthly_quota, leaderboard_channel_id)
         
         try:
             with self.get_connection() as conn:
@@ -342,6 +332,21 @@ class DatabaseManager:
         if config and config['leaderboard_channel_id']:
             return config['leaderboard_channel_id']
         return channel_id
+    
+    def delete_channel_config(self, channel_id: str):
+        """Delete channel configuration to reset to defaults"""
+        sql = "DELETE FROM channel_configs WHERE channel_id = %s"
+        
+        try:
+            with self.get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(sql, (channel_id,))
+                    conn.commit()
+                    logger.info(f"Channel config deleted for {channel_id}")
+                    return True
+        except Exception as e:
+            logger.error(f"Failed to delete channel config: {e}")
+            return False
     
     def close(self):
         """Close the connection pool"""
