@@ -129,7 +129,7 @@ def handle_config_command(ack, command, client, db_manager):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "*How to find a Channel ID:*\n• Right-click on a channel name → 'Channel details'\n• Channel ID is listed with a copy button\n• Or right-click → 'Copy link' and extract ID from URL\n\n*Example:* Use `C1234567890` (starts with C)"
+                    "text": "*How to find a Channel ID:*\n• Right-click on a channel name → 'Channel details'\n• Channel ID is listed with a copy button\n• Or right-click → 'Copy link' and extract ID from URL\n\n*Example:* Use `C1234567890` or `G010BMGBNCA`"
                 }
             }
         ]
