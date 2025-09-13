@@ -129,7 +129,7 @@ def handle_config_command(ack, command, client, db_manager):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "*How to find a Channel ID:*\n• Right-click on a channel name → 'Copy link'\n• The ID is the part after `/archives/` (starts with C)\n• Or use the channel picker in Slack and copy the ID from the URL\n\n*Example:* If the channel link is `https://workspace.slack.com/archives/C1234567890`, use `C1234567890`"
+                    "text": "*How to find a Channel ID:*\n• Right-click on a channel name → 'Channel details'\n• Channel ID is listed with a copy button\n• Or right-click → 'Copy link' and extract ID from URL\n\n*Example:* Use `C1234567890` (starts with C)"
                 }
             }
         ]
@@ -168,8 +168,12 @@ def handle_config_modal_submission(ack, body, client, db_manager):
             except (ValueError, KeyError):
                 quota = None
         elif 'leaderboard_input' in block_values:
-            leaderboard_channel = block_values['leaderboard_input']['value'].strip()
-            if not leaderboard_channel:
+            leaderboard_value = block_values['leaderboard_input']['value']
+            if leaderboard_value:
+                leaderboard_channel = leaderboard_value.strip()
+                if not leaderboard_channel:
+                    leaderboard_channel = None
+            else:
                 leaderboard_channel = None
     
     # Save configuration
