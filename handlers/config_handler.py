@@ -82,12 +82,9 @@ def handle_config_command(ack, command, client, db_manager):
                 }
             },
             {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "*Monthly Quota*"
-                },
-                "accessory": {
+                "type": "input",
+                "block_id": "quota_block",
+                "element": {
                     "type": "plain_text_input",
                     "action_id": "quota_input",
                     "placeholder": {
@@ -95,15 +92,16 @@ def handle_config_command(ack, command, client, db_manager):
                         "text": "Enter monthly quota"
                     },
                     "initial_value": str(current_quota)
+                },
+                "label": {
+                    "type": "plain_text",
+                    "text": "Monthly Quota"
                 }
             },
             {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "*Leaderboard Channel Override*\n_Optional: Use another channel's leaderboard_"
-                },
-                "accessory": {
+                "type": "input",
+                "block_id": "leaderboard_block",
+                "element": {
                     "type": "plain_text_input",
                     "action_id": "leaderboard_input",
                     "placeholder": {
@@ -111,7 +109,12 @@ def handle_config_command(ack, command, client, db_manager):
                         "text": "Channel ID (e.g., C1234567890)"
                     },
                     "initial_value": current_leaderboard
-                }
+                },
+                "label": {
+                    "type": "plain_text",
+                    "text": "Leaderboard Channel Override (Optional)"
+                },
+                "optional": True
             },
             {
                 "type": "context",
