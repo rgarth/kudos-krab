@@ -17,6 +17,7 @@ An overly enthusiastic Slack bot for recording team kudos
 - `/kk @user1 @user2 message` - Send kudos to multiple people
 - `/kk leaderboard` - Show monthly leaderboard
 - `/kk stats` - Show your personal stats
+- `/kk config [edit|default]` - Show config, edit settings, or reset to defaults
 - `/kk help` - Show help message
 
 ## Architecture
@@ -37,6 +38,15 @@ CREATE TABLE kudos (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE channel_configs (
+    channel_id VARCHAR(255) PRIMARY KEY,
+    personality_name VARCHAR(255),
+    monthly_quota INTEGER,
+    leaderboard_channel_id VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for performance
 CREATE INDEX idx_kudos_sender ON kudos(sender);
 CREATE INDEX idx_kudos_receiver ON kudos(receiver);
@@ -44,19 +54,22 @@ CREATE INDEX idx_kudos_timestamp ON kudos(timestamp);
 CREATE INDEX idx_kudos_channel ON kudos(channel_id);
 CREATE INDEX idx_kudos_sender_channel ON kudos(sender, channel_id);
 CREATE INDEX idx_kudos_receiver_channel ON kudos(receiver, channel_id);
+CREATE INDEX idx_channel_configs_leaderboard ON channel_configs(leaderboard_channel_id);
 ```
 
 **Note:** The `message` column has been removed for privacy reasons. Messages are only used for channel announcements and are not stored in the database.
 
 ## Multi-Channel Support
 
-Kudos Krab now supports multiple channels! Each channel operates independently:
+Kudos Krab supports multiple channels with per-channel configuration:
 
 - **Channel Isolation**: Kudos given in #general don't affect #engineering
 - **Channel-Specific Leaderboards**: `/kk leaderboard` shows top users for that channel only
 - **Channel-Specific Stats**: `/kk stats` shows your stats for that channel only
 - **Channel-Specific Quotas**: Monthly quota applies per channel
-- **Automatic Channel Detection**: The bot automatically detects which channel the command was sent from
+- **Channel Overrides**: Share leaderboards between channels (e.g., #engineering uses #general's leaderboard)
+- **Per-Channel Personality**: Each channel can have different bot personality
+- **Configuration**: Use `/kk config edit` to customize channel settings
 
 ## Environment Variables
 
