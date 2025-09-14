@@ -232,9 +232,9 @@ def handle_config_modal_submission(ack, body, client, db_manager):
         
         message = f"""✅ *Configuration saved for <#{channel_id}>*
 
-• **Personality:** {personality_name.title()}
-• **Monthly Quota:** {quota_text}
-• **Leaderboard:** {leaderboard_text}
+• *Personality:* {personality_name.title()}
+• *Monthly Quota:* {quota_text}
+• *Leaderboard:* {leaderboard_text}
 
 Settings will take effect immediately! 🦀"""
         
@@ -277,18 +277,18 @@ def show_current_config(respond, channel_id, db_manager):
         message = f"""📋 *Current Configuration for <#{channel_id}>*
 
 🔄 *Channel Override Active*
-• **Leaderboard:** <#{leaderboard_channel}>
-• **Personality:** {inherited_personality.title()} (inherited from <#{leaderboard_channel}>)
-• **Monthly Quota:** {inherited_quota} (inherited from <#{leaderboard_channel}>)
+• *Leaderboard:* <#{leaderboard_channel}>
+• *Personality:* {inherited_personality.title()} (inherited from <#{leaderboard_channel}>)
+• *Monthly Quota:* {inherited_quota} (inherited from <#{leaderboard_channel}>)
 
 Use `/kk config edit` to modify these settings."""
     else:
         # Normal configuration
         message = f"""📋 *Current Configuration for <#{channel_id}>*
 
-• **Personality:** {personality_name.title()}
-• **Monthly Quota:** {quota}
-• **Leaderboard:** {leaderboard_channel}
+• *Personality:* {personality_name.title()}
+• *Monthly Quota:* {quota}
+• *Leaderboard:* {leaderboard_channel}
 
 Use `/kk config edit` to modify these settings."""
     
