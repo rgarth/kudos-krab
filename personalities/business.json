@@ -1,0 +1,71 @@
+{
+  "name": "Business",
+  "description": "Corporate jargon and buzzword-heavy with meaningless business speak",
+  "help": {
+    "title": "Greetings, valued team member! Let's circle back on our kudos initiative and drive some meaningful engagement.",
+    "send_kudos": "🎯 Leverage Kudos:",
+    "commands": "📊 Strategic Commands:",
+    "footer": "Let's align on this and move the needle forward! 🚀"
+  },
+  "errors": {
+    "no_mentions": [
+      "I need to circle back on this - we're not aligned on the stakeholder identification process. Please leverage the @username functionality to ensure proper resource allocation and stakeholder engagement. Let's table this for now and revisit with a more strategic approach.",
+      "We're not seeing the synergies here. To optimize our kudos delivery mechanism, we need to identify key stakeholders using the @username protocol. This will enable us to scale our recognition framework and drive better outcomes.",
+      "Let's take a step back and reassess our approach. The current implementation lacks proper stakeholder mapping. Please utilize the @username feature to ensure we're maximizing our recognition ROI and driving meaningful engagement."
+    ],
+    "user_not_found": "We've encountered a stakeholder identification challenge. The username @{username} doesn't align with our current user base. Let's leverage our enterprise directory or ensure proper user provisioning. This is a great opportunity to optimize our user management processes and drive better stakeholder engagement.",
+    "self_kudos": [
+      "I appreciate the initiative, but we need to maintain proper governance around self-recognition protocols. Let's pivot to a more collaborative approach and leverage our team synergies for recognition delivery. This aligns with our best practices framework.",
+      "While I value the entrepreneurial spirit, our recognition framework doesn't support self-service kudos. Let's circle back and leverage our team dynamics to drive proper stakeholder recognition and engagement.",
+      "We need to maintain strategic alignment here. Self-recognition doesn't scale with our organizational objectives. Let's leverage our collaborative ecosystem to drive meaningful recognition outcomes."
+    ],
+    "bot_kudos": [
+      "I'm flattered by the recognition, but as a strategic enabler, I'm focused on optimizing your team's recognition processes. Let's leverage this opportunity to drive stakeholder engagement with your actual team members. This will maximize our collective impact and drive better outcomes.",
+      "While I appreciate the sentiment, my role is to facilitate and optimize your team's recognition framework. Let's pivot to leveraging our human capital for meaningful recognition delivery. This aligns with our strategic objectives.",
+      "I'm here to enable and scale your recognition processes, not consume them. Let's leverage this moment to drive stakeholder engagement with your team members. This will optimize our collective impact and drive meaningful outcomes."
+    ],
+    "empty_message": "We need to enhance our communication strategy. Empty kudos don't drive meaningful engagement or stakeholder value. Let's leverage this opportunity to craft a more impactful message that aligns with our recognition framework and drives better outcomes.",
+    "quota_exceeded": "We've hit our monthly recognition capacity. You need {kudos_needed} more kudos but only have {remaining} remaining this month. Let's circle back and optimize our recognition allocation strategy. This is a great opportunity to reassess our stakeholder engagement approach and drive better resource utilization.",
+    "failed_kudos": "We encountered some challenges with our recognition delivery for {failed_mentions}. Let's circle back and leverage our troubleshooting protocols to optimize the delivery mechanism. This is a great learning opportunity to enhance our recognition framework.",
+    "database_error": "We're experiencing some technical challenges with our recognition infrastructure. Let's circle back and leverage our technical support protocols to optimize the system performance. This aligns with our continuous improvement framework.",
+    "stats_error": "We're encountering some data retrieval challenges with our analytics platform. Let's leverage our technical support processes to optimize the reporting mechanism. This is a great opportunity to enhance our data infrastructure.",
+    "generic_error": "We've encountered an unexpected challenge in our recognition ecosystem. Let's circle back and leverage our standard operating procedures to optimize the system performance. This aligns with our continuous improvement framework."
+  },
+  "success": {
+    "kudos_single": "Excellent! We've successfully delivered recognition and optimized our stakeholder engagement. You have {remaining} kudos remaining this month - let's continue leveraging our recognition framework to drive meaningful outcomes and maximize team synergies! 🚀",
+    "kudos_multiple": "Outstanding! We've scaled our recognition delivery and optimized stakeholder engagement across {count} team members. You have {remaining} kudos remaining this month - this is a great example of leveraging our recognition framework to drive collective impact! 🚀",
+    "announcement_single": [
+      "🎯 *STRATEGIC RECOGNITION DELIVERED* 🎯\n<@{user_id}> has leveraged our recognition framework to drive meaningful engagement with <@{receiver}>!\n\n> {message}\n\n*This is exactly the kind of stakeholder engagement that moves the needle forward!* 🚀",
+      "🎯 *OPTIMIZED RECOGNITION OUTCOMES* 🎯\n<@{user_id}> has successfully delivered recognition to <@{receiver}> using our strategic framework!\n\n> {message}\n\n*This demonstrates excellent alignment with our recognition best practices!* 🚀",
+      "🎯 *MEANINGFUL STAKEHOLDER ENGAGEMENT* 🎯\n<@{user_id}> has leveraged our recognition ecosystem to drive value with <@{receiver}>!\n\n> {message}\n\n*This is a perfect example of scaling our recognition impact!* 🚀"
+    ],
+    "announcement_multiple": [
+      "🎯 *SCALED RECOGNITION DELIVERY* 🎯\n<@{user_id}> has optimized stakeholder engagement across {receivers} using our strategic framework!\n\n> {message}\n\n*This demonstrates excellent leverage of our recognition ecosystem!* 🚀",
+      "🎯 *STRATEGIC TEAM ENGAGEMENT* 🎯\n<@{user_id}> has successfully scaled recognition delivery to {receivers}!\n\n> {message}\n\n*This is a great example of maximizing our collective impact!* 🚀",
+      "🎯 *OPTIMIZED STAKEHOLDER OUTCOMES* 🎯\n<@{user_id}> has leveraged our recognition framework to drive engagement with {receivers}!\n\n> {message}\n\n*This aligns perfectly with our strategic objectives!* 🚀"
+    ]
+  },
+  "app_mention": "Greetings! I'm your strategic recognition enabler, focused on optimizing stakeholder engagement and driving meaningful outcomes through our kudos framework.\n\nLet's align on our recognition protocols:\n• `/kk @user message` - Leverage recognition for individual stakeholders\n• `/kk @user1 @user2 message` - Scale recognition across multiple stakeholders\n• `/kk leaderboard` - Access our strategic performance metrics\n• `/kk leaderboard Aug 2025` - Leverage historical performance data\n• `/kk stats` - Review your recognition analytics\n\nLet's circle back and drive some meaningful engagement! 🚀",
+  "leaderboard": {
+    "title": "🎯 {month_name} STRATEGIC PERFORMANCE METRICS 🎯",
+    "senders_title": "🏆 TOP RECOGNITION ENABLERS 🏆",
+    "receivers_title": "🌟 HIGH-PERFORMING STAKEHOLDERS 🌟",
+    "no_senders": "We haven't optimized our recognition delivery yet this month. Let's leverage this opportunity to drive stakeholder engagement and move the needle forward!",
+    "no_receivers": "Our stakeholder recognition framework hasn't been activated this month. Let's circle back and optimize our engagement strategy!",
+    "top_sender_single": "Our top recognition enabler is <@{sender}> with {count} strategic deliveries 🚀",
+    "top_sender_multiple": "Our top recognition enablers are {senders} with {count} strategic deliveries each 🚀",
+    "posted_confirmation": "✅ Strategic metrics have been successfully deployed to the channel!",
+    "footer": "Let's continue leveraging our recognition framework to drive meaningful outcomes! 🚀"
+  },
+  "stats": {
+    "title": "🎯 YOUR STRATEGIC RECOGNITION ANALYTICS 🎯",
+    "this_month": "Current Month Performance:",
+    "all_time": "Historical Performance Data:",
+    "kudos_sent": "Recognition Deliveries:",
+    "kudos_received": "Stakeholder Recognition:",
+    "remaining": "Available Recognition Capacity:",
+    "total_sent": "Total Recognition Deliveries:",
+    "total_received": "Total Stakeholder Recognition:",
+    "footer": "You're driving excellent stakeholder engagement and maximizing our recognition ROI! 🚀"
+  }
+}
