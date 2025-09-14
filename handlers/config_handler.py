@@ -32,10 +32,123 @@ def handle_config_command(ack, command, client, db_manager):
     # Set current values
     current_personality = current_config['personality_name'] if current_config else None
     current_quota = current_config['monthly_quota'] if current_config else MONTHLY_QUOTA
-    current_leaderboard = current_config['leaderboard_channel_id'] if current_config else ""
+    override_channel_id = current_config['leaderboard_channel_id'] if current_config else ""
     
     # Check if channel override is active
-    has_override = bool(current_leaderboard)
+    has_override = bool(override_channel_id)
+    
+    # Build blocks dynamically based on override status
+    blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"Configure kudos settings for <#{channel_id}>"
+            }
+        },
+        {
+            "type": "divider"
+        }
+    ]
+    
+    # Add personality block
+    if not has_override:
+        blocks.append({
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Personality*"
+            },
+            "accessory": {
+                "type": "static_select",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Select personality"
+                },
+                "options": personality_options,
+                "action_id": "personality_select",
+                "initial_option": next(
+                    (opt for opt in personality_options if opt["value"] == current_personality),
+                    personality_options[0] if personality_options else None
+                )
+            }
+        })
+    else:
+        blocks.append({
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Personality*\n_Disabled - inherited from target channel_"
+            }
+        })
+    
+    # Add quota block
+    if not has_override:
+        blocks.append({
+            "type": "input",
+            "block_id": "quota_block",
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "quota_input",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Enter monthly quota"
+                },
+                "initial_value": str(current_quota) if current_quota is not None else ""
+            },
+            "label": {
+                "type": "plain_text",
+                "text": "Monthly Quota"
+            }
+        })
+    else:
+        blocks.append({
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Monthly Quota*\n_Disabled - inherited from target channel_"
+            }
+        })
+    
+    # Add leaderboard block
+    blocks.append({
+        "type": "input",
+        "block_id": "leaderboard_block",
+        "element": {
+            "type": "plain_text_input",
+            "action_id": "leaderboard_input",
+            "placeholder": {
+                "type": "plain_text",
+                "text": "Channel ID (e.g., C1234567890)"
+            },
+            "initial_value": override_channel_id if override_channel_id else ""
+        },
+        "label": {
+            "type": "plain_text",
+            "text": "Leaderboard Channel Override (Optional)"
+        },
+        "optional": True
+    })
+    
+    # Add help text
+    blocks.extend([
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "mrkdwn",
+                    "text": "💡 Leave empty to use this channel's leaderboard"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*How to find a Channel ID:*\n• Right-click on a channel name → 'Channel details'\n• Channel ID is listed with a copy button\n• Or right-click → 'Copy link' and extract ID from URL\n\n*Example:* Use `C1234567890` or `G010BMGBNCA`"
+            }
+        }
+    ])
     
     # Create the modal
     modal = {
@@ -53,101 +166,7 @@ def handle_config_command(ack, command, client, db_manager):
             "type": "plain_text",
             "text": "Cancel"
         },
-        "blocks": [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"Configure kudos settings for <#{channel_id}>"
-                }
-            },
-            {
-                "type": "divider"
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"*Personality*{'(inherited from target channel)' if has_override else ''}"
-                },
-                "accessory": {
-                    "type": "static_select",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "Select personality"
-                    },
-                    "options": personality_options,
-                    "action_id": "personality_select",
-                    "initial_option": next(
-                        (opt for opt in personality_options if opt["value"] == current_personality),
-                        personality_options[0] if personality_options else None
-                    )
-                }
-            } if not has_override else {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "*Personality*\n_Disabled - inherited from target channel_"
-                }
-            },
-            {
-                "type": "input",
-                "block_id": "quota_block",
-                "element": {
-                    "type": "plain_text_input",
-                    "action_id": "quota_input",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "Enter monthly quota"
-                    },
-                    "initial_value": str(current_quota)
-                },
-                "label": {
-                    "type": "plain_text",
-                    "text": f"Monthly Quota{'(inherited from target channel)' if has_override else ''}"
-                }
-            } if not has_override else {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "*Monthly Quota*\n_Disabled - inherited from target channel_"
-                }
-            },
-            {
-                "type": "input",
-                "block_id": "leaderboard_block",
-                "element": {
-                    "type": "plain_text_input",
-                    "action_id": "leaderboard_input",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "Channel ID (e.g., C1234567890)"
-                    },
-                    "initial_value": current_leaderboard
-                },
-                "label": {
-                    "type": "plain_text",
-                    "text": "Leaderboard Channel Override (Optional)"
-                },
-                "optional": True
-            },
-            {
-                "type": "context",
-                "elements": [
-                    {
-                        "type": "mrkdwn",
-                        "text": "💡 Leave empty to use this channel's leaderboard"
-                    }
-                ]
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "*How to find a Channel ID:*\n• Right-click on a channel name → 'Channel details'\n• Channel ID is listed with a copy button\n• Or right-click → 'Copy link' and extract ID from URL\n\n*Example:* Use `C1234567890` or `G010BMGBNCA`"
-                }
-            }
-        ]
+        "blocks": blocks
     }
     
     # Add channel_id to private metadata for the modal submission
