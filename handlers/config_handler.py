@@ -34,6 +34,9 @@ def handle_config_command(ack, command, client, db_manager):
     current_quota = current_config['monthly_quota'] if current_config else MONTHLY_QUOTA
     current_leaderboard = current_config['leaderboard_channel_id'] if current_config else ""
     
+    # Check if channel override is active
+    has_override = bool(current_leaderboard)
+    
     # Create the modal
     modal = {
         "type": "modal",
@@ -65,7 +68,7 @@ def handle_config_command(ack, command, client, db_manager):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": "*Personality*"
+                    "text": f"*Personality*{'(inherited from target channel)' if has_override else ''}"
                 },
                 "accessory": {
                     "type": "static_select",
@@ -79,6 +82,12 @@ def handle_config_command(ack, command, client, db_manager):
                         (opt for opt in personality_options if opt["value"] == current_personality),
                         personality_options[0] if personality_options else None
                     )
+                }
+            } if not has_override else {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Personality*\n_Disabled - inherited from target channel_"
                 }
             },
             {
@@ -95,7 +104,13 @@ def handle_config_command(ack, command, client, db_manager):
                 },
                 "label": {
                     "type": "plain_text",
-                    "text": "Monthly Quota"
+                    "text": f"Monthly Quota{'(inherited from target channel)' if has_override else ''}"
+                }
+            } if not has_override else {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*Monthly Quota*\n_Disabled - inherited from target channel_"
                 }
             },
             {
@@ -176,6 +191,11 @@ def handle_config_modal_submission(ack, body, client, db_manager):
             else:
                 leaderboard_channel = None
     
+    # If channel override is set, ignore personality and quota (they're inherited)
+    if leaderboard_channel:
+        personality = None
+        quota = None
+    
     # Save configuration
     success = db_manager.save_channel_config(
         channel_id=channel_id,
@@ -226,15 +246,30 @@ def show_current_config(respond, channel_id, db_manager):
     leaderboard_channel = config['leaderboard_channel_id'] or "this channel"
     
     if leaderboard_channel != "this channel":
-        leaderboard_text = f"<#{leaderboard_channel}>"
+        # Channel override is set - show inherited settings
+        target_config = db_manager.get_channel_config(leaderboard_channel)
+        if target_config:
+            inherited_personality = target_config['personality_name'] or "default"
+            inherited_quota = target_config['monthly_quota'] or "default"
+        else:
+            inherited_personality = "default"
+            inherited_quota = "default"
+        
+        message = f"""📋 *Current Configuration for <#{channel_id}>*
+
+🔄 *Channel Override Active*
+• **Leaderboard:** <#{leaderboard_channel}>
+• **Personality:** {inherited_personality.title()} (inherited from <#{leaderboard_channel}>)
+• **Monthly Quota:** {inherited_quota} (inherited from <#{leaderboard_channel}>)
+
+Use `/kk config edit` to modify these settings."""
     else:
-        leaderboard_text = leaderboard_channel
-    
-    message = f"""📋 *Current Configuration for <#{channel_id}>*
+        # Normal configuration
+        message = f"""📋 *Current Configuration for <#{channel_id}>*
 
 • **Personality:** {personality_name.title()}
 • **Monthly Quota:** {quota}
-• **Leaderboard:** {leaderboard_text}
+• **Leaderboard:** {leaderboard_channel}
 
 Use `/kk config edit` to modify these settings."""
     

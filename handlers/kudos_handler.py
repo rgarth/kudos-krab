@@ -71,9 +71,15 @@ def handle_kudos_command(command, say, respond, app, db_manager):
     monthly_count = db_manager.get_monthly_kudos_count(user_id, current_month, current_year, channel_id)
     kudos_needed = len(unique_users)
     
-    # Get channel-specific quota
+    # Get channel-specific quota (with inheritance from override channel)
     config = db_manager.get_channel_config(channel_id)
-    monthly_quota = config['monthly_quota'] if config and config['monthly_quota'] else MONTHLY_QUOTA
+    if config and config['leaderboard_channel_id']:
+        # Channel override active - get quota from target channel
+        target_config = db_manager.get_channel_config(config['leaderboard_channel_id'])
+        monthly_quota = target_config['monthly_quota'] if target_config and target_config['monthly_quota'] else MONTHLY_QUOTA
+    else:
+        # Normal channel - use own quota
+        monthly_quota = config['monthly_quota'] if config and config['monthly_quota'] else MONTHLY_QUOTA
     
     if monthly_count + kudos_needed > monthly_quota:
         remaining = monthly_quota - monthly_count

@@ -16,9 +16,15 @@ def handle_stats_command(user_id, respond, db_manager, channel_id=None):
         
         user_stats = db_manager.get_user_stats(user_id, channel_id)
         
-        # Get channel-specific quota
+        # Get channel-specific quota (with inheritance from override channel)
         config = db_manager.get_channel_config(channel_id)
-        monthly_quota = config['monthly_quota'] if config and config['monthly_quota'] else MONTHLY_QUOTA
+        if config and config['leaderboard_channel_id']:
+            # Channel override active - get quota from target channel
+            target_config = db_manager.get_channel_config(config['leaderboard_channel_id'])
+            monthly_quota = target_config['monthly_quota'] if target_config and target_config['monthly_quota'] else MONTHLY_QUOTA
+        else:
+            # Normal channel - use own quota
+            monthly_quota = config['monthly_quota'] if config and config['monthly_quota'] else MONTHLY_QUOTA
         
         stats_message = format_stats_message(
             user_id=user_id,
