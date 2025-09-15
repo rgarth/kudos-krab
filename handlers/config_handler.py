@@ -1,6 +1,6 @@
 import logging
 from config.personalities import get_available_personalities, load_personality_for_channel
-from config.settings import MONTHLY_QUOTA
+from config.settings import MONTHLY_QUOTA, DEFAULT_PERSONALITY
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ def handle_config_command(ack, command, client, db_manager):
         })
     
     # Set current values
-    current_personality = current_config['personality_name'] if current_config else None
+    current_personality = current_config['personality_name'] if current_config else DEFAULT_PERSONALITY
     current_quota = current_config['monthly_quota'] if current_config else MONTHLY_QUOTA
     override_channel_id = current_config['leaderboard_channel_id'] if current_config else ""
     
@@ -69,7 +69,7 @@ def handle_config_command(ack, command, client, db_manager):
                 "action_id": "personality_select",
                 "initial_option": next(
                     (opt for opt in personality_options if opt["value"] == current_personality),
-                    personality_options[0] if personality_options else None
+                    None
                 )
             }
         })
@@ -226,8 +226,8 @@ def handle_config_modal_submission(ack, body, client, db_manager):
     if success:
         # Send private confirmation message to user
         user_id = body['user']['id']
-        personality_name = personality or "default"
-        quota_text = f"{quota}" if quota else "default"
+        personality_name = personality or DEFAULT_PERSONALITY
+        quota_text = f"{quota}" if quota else str(MONTHLY_QUOTA)
         leaderboard_text = f"<#{leaderboard_channel}>" if leaderboard_channel else "this channel"
         
         message = f"""✅ *Configuration saved for <#{channel_id}>*
@@ -260,19 +260,19 @@ def show_current_config(respond, channel_id, db_manager):
         respond("No custom configuration set for this channel. Using default settings.")
         return
     
-    personality_name = config['personality_name'] or "default"
-    quota = config['monthly_quota'] or "default"
+    personality_name = config['personality_name'] or DEFAULT_PERSONALITY
+    quota = config['monthly_quota'] or MONTHLY_QUOTA
     leaderboard_channel = config['leaderboard_channel_id'] or "this channel"
     
     if leaderboard_channel != "this channel":
         # Channel override is set - show inherited settings
         target_config = db_manager.get_channel_config(leaderboard_channel)
         if target_config:
-            inherited_personality = target_config['personality_name'] or "default"
-            inherited_quota = target_config['monthly_quota'] or "default"
+            inherited_personality = target_config['personality_name'] or DEFAULT_PERSONALITY
+            inherited_quota = target_config['monthly_quota'] or MONTHLY_QUOTA
         else:
-            inherited_personality = "default"
-            inherited_quota = "default"
+            inherited_personality = DEFAULT_PERSONALITY
+            inherited_quota = MONTHLY_QUOTA
         
         message = f"""📋 *Current Configuration for <#{channel_id}>*
 
