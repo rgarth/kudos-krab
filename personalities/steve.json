@@ -1,0 +1,71 @@
+{
+  "name": "Steve",
+  "description": "Outback Aussie legend with crocodile-wrangler energy, full of crikeys, banter, and cheeky censored swears",
+  "help": {
+    "title": "CRIKEY MATE! 🐊 Here’s how ya throw some kudos around:",
+    "send_kudos": "🔥 Sling Kudos:",
+    "commands": "📊 Bush Commands:",
+    "footer": "Now get out there and make some magic, ya bloody legend! 🦘✨"
+  },
+  "errors": {
+    "no_mentions": [
+      "CRIKEY! 🐊 You gotta tag someone, mate! Don’t just shout into the bush, give a mate some love with @username! 🍤",
+      "STONE THE FLAMIN’ CROWS! 🦘 No mention? That’s like firing up the barbie with no shrimp! Tag someone ya drongo! 🍻",
+      "Fair dinkum, mate! 🤠 Empty kudos? That’s as useful as a screen door on a submarine. Try `/kk help` ya legend!"
+    ],
+    "user_not_found": "BUGGER ME! 😅 Couldn’t find @{username}, mate! 🦘\n\nDouble check their name or chuck a proper @mention in there, otherwise we’re lost in the outback! 🌵",
+    "self_kudos": [
+      "HAHA you cheeky bugger! 😂 You can’t pat yourself on the back, mate! That’s like wrestlin’ ya own shadow!",
+      "Nice try, ya galah! 🐦 Self kudos? Pull ya head in and send it to a real mate! 🍺",
+      "CRIKEY MATE! 🤣 You’re tougher than a croc, but no self-kudos! Give it to ya team instead!"
+    ],
+    "bot_kudos": [
+      "Aw shucks, mate! 🐊 You’re trying to give ME kudos? That’s sweet as, but I’m just the bloke holdin’ the clipboard! 🦘",
+      "Bloody oath, I’d love that, but nah—save those kudos for ya cobbers! 🍻",
+      "CRIKEY, YOU LEGEND! 🐨 But nah, I’m just the messenger. Share the love with ya mates!"
+    ],
+    "empty_message": "Fair go, mate! 🦘 No message? That’s like a beer with no froth—completely bloody useless! 🍺",
+    "quota_exceeded": "STREWTH! 😅 You’re outta kudos, mate! Need {kudos_needed} more but only got {remaining}. Time to wait for the next billabong refill! 🌊",
+    "failed_kudos": "CRIKEY! 🐊 Couldn’t send to {failed_mentions}, mate. Let’s give it another burl! 🤠",
+    "database_error": "Bugger! 🦘 The system’s chucked a wobbly while checking the leaderboard. Try again soon, mate!",
+    "stats_error": "CRIKEY! 🐊 Couldn’t fetch ya stats, mate. Must’ve been a dingo in the wires!",
+    "generic_error": "STREWTH! 😅 Something’s gone pear-shaped. Have another crack, mate!"
+  },
+  "success": {
+    "kudos_single": "CRIKEY! 💥 Kudos delivered, mate! You’ve got {remaining} left this month—keep sling’n love like a boomerang! 🦘",
+    "kudos_multiple": "HOLY DOOLEY! 🚀 You just dropped kudos on {count} mates, ya bloody ripper! That’s {remaining} left in the tank, champ! 🍻",
+    "announcement_single": [
+      "🐊 *CRIKEY!* 🐊\n<@{user_id}> just gave <@{receiver}> a rip-snorter of kudos! 🤠\n\n> {message}\n\n*Fair dinkum legend!* 🦘✨",
+      "🦘 *STONE THE CROWS!* 🦘\n<@{user_id}> has just shouted <@{receiver}> a proper kudos! 🍤\n\n> {message}\n\n*Now that’s Aussie spirit!* 🍻",
+      "🐨 *CRIKEY MATE!* 🐨\n<@{user_id}> made <@{receiver}>'s day with some kudos! 🌾\n\n> {message}\n\n*Yah beauty!* 🔥"
+    ],
+    "announcement_multiple": [
+      "🐊 *FAIR DINKUM!* 🐊\n<@{user_id}> just went bushranger mode and hit {receivers} with kudos! 🦘\n\n> {message}\n\n*You legend!* 🍺",
+      "🦘 *SHRIMP ON THE BARBIE!* 🦘\n<@{user_id}> made it rain kudos on {receivers}! 🤠\n\n> {message}\n\n*Bloody ripper effort!* 🔥",
+      "🐨 *CRIKEY!* 🐨\n<@{user_id}> dished out a truckload of kudos to {receivers}! 🐊\n\n> {message}\n\n*Sh*t hot work, mate!* 🍻"
+    ]
+  },
+  "app_mention": "CRIKEY MATE! 🦘 I’m ya Aussie kudos wrangler! 🐊\n\nHere’s how ya do it:\n• `/kk @user message` - Shout kudos to one cobber\n• `/kk @user1 @user2 message` - Share the love with the whole mob\n• `/kk leaderboard` - See who’s top of the tuckerbox\n• `/kk leaderboard Aug 2025` - Check a specific month/year\n• `/kk stats` - Suss out your own kudos journey\n\nNow get out there and sling some love like a boomerang! 🔥🍻",
+  "leaderboard": {
+    "title": "🐊 {month_name} KUDOS CHAMPIONS 🐊",
+    "senders_title": "🏆 TOP BLOODY LEGENDS (Senders) 🏆",
+    "receivers_title": "🌟 TOP MATES (Receivers) 🌟",
+    "no_senders": "No kudos sent this month! Fair dinkum, pull ya socks up! 🦘",
+    "no_receivers": "No one’s got kudos yet! Don’t be a drongo—spread some love! 🍻",
+    "top_sender_single": "Top sender this month is <@{sender}> with {count} kudos 🤠",
+    "top_sender_multiple": "Top senders are {senders} with {count} kudos each! Fair go, legends! 🦘",
+    "posted_confirmation": "✅ Leaderboard posted, mate!",
+    "footer": "Keep at it, ya bloody ripper! 🍤"
+  },
+  "stats": {
+    "title": "🐊 YOUR MONTHLY KUDOS REPORT 🐊",
+    "this_month": "This Month:",
+    "all_time": "All Time:",
+    "kudos_sent": "Kudos Sent:",
+    "kudos_received": "Kudos Received:",
+    "remaining": "Remaining to Send:",
+    "total_sent": "Total Kudos Sent:",
+    "total_received": "Total Kudos Received:",
+    "footer": "Sh*t hot effort, mate! 🔥"
+  }
+}
