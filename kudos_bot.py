@@ -9,6 +9,7 @@ from handlers.leaderboard_handler import handle_leaderboard_command
 from handlers.stats_handler import handle_stats_command
 from handlers.kudos_handler import handle_kudos_command
 from handlers.config_handler import handle_config_command, handle_config_modal_submission, show_current_config, reset_config_to_defaults
+from handlers.status_handler import handle_status_command
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -72,6 +73,9 @@ def handle_kudos_command_wrapper(ack, command, say, respond):
             else:
                 # "/kk config" with other parameters - show current configuration
                 show_current_config(respond, channel_id, db_manager)
+            return
+        elif first_word == "status":
+            handle_status_command(ack, respond, channel_id, db_manager)
             return
         elif len(text.split()) == 1:
             # Single word that's not a recognized command - show help
