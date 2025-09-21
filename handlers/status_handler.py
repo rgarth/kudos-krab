@@ -9,7 +9,7 @@ from config.personalities import load_personality_for_channel
 
 logger = logging.getLogger(__name__)
 
-def handle_status_command(ack, respond, channel_id, db_manager):
+def handle_status_command(ack, respond, channel_id, db_manager, client):
     """Handle the /kk status command to show bot operational status."""
     ack()
     
@@ -18,7 +18,7 @@ def handle_status_command(ack, respond, channel_id, db_manager):
         personality = load_personality_for_channel(channel_id, db_manager)
         
         # Get bot status information
-        status_info = get_bot_status(db_manager)
+        status_info = get_bot_status(db_manager, client)
         
         # Format the status message
         message = format_status_message(status_info, personality)
@@ -30,9 +30,18 @@ def handle_status_command(ack, respond, channel_id, db_manager):
         logger.error(f"Failed to get bot status: {e}")
         respond("❌ Failed to get bot status. Check logs for details.", response_type="ephemeral")
 
-def get_bot_status(db_manager):
+def get_bot_status(db_manager, client):
     """Get comprehensive bot status information."""
     try:
+        # Get bot authentication info
+        auth_response = client.auth_test()
+        bot_info = {
+            'bot_id': auth_response.get('bot_id'),
+            'user_id': auth_response.get('user_id'),
+            'team': auth_response.get('team'),
+            'team_id': auth_response.get('team_id'),
+            'url': auth_response.get('url')
+        }
         # Get all channels with kudos activity OR custom configs
         # This includes channels that override their leaderboard to another channel
         channels_query = """
@@ -83,6 +92,7 @@ def get_bot_status(db_manager):
                 config_channels = cursor.fetchall()
         
         return {
+            'bot_info': bot_info,
             'channels': channels,
             'last_kudos': last_kudos_row,
             'total_kudos': total_kudos,
@@ -96,6 +106,7 @@ def get_bot_status(db_manager):
 
 def format_status_message(status_info, personality):
     """Format the status information into a readable message."""
+    bot_info = status_info['bot_info']
     channels = status_info['channels']
     last_kudos = status_info['last_kudos']
     total_kudos = status_info['total_kudos']
@@ -105,7 +116,10 @@ def format_status_message(status_info, personality):
     # Bot status
     message = f"🤖 *Kudos Krab Bot Status*\n"
     message += f"🟢 *Status:* Online\n"
-    message += f"⏰ *Checked:* {timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
+    message += f"⏰ *Checked:* {timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')}\n"
+    message += f"🏢 *Workspace:* {bot_info.get('team', 'Unknown')}\n"
+    message += f"🔗 *URL:* {bot_info.get('url', 'Unknown')}\n"
+    message += f"🆔 *Bot ID:* {bot_info.get('bot_id', 'Unknown')}\n\n"
     
     # Channels (combined from kudos activity and custom configs)
     if channels:

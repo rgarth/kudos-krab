@@ -75,7 +75,7 @@ def handle_kudos_command_wrapper(ack, command, say, respond):
                 show_current_config(respond, channel_id, db_manager)
             return
         elif first_word == "status":
-            handle_status_command(ack, respond, channel_id, db_manager)
+            handle_status_command(ack, respond, channel_id, db_manager, app.client)
             return
         elif len(text.split()) == 1:
             # Single word that's not a recognized command - show help
