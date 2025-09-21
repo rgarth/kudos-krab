@@ -33,10 +33,14 @@ def handle_status_command(ack, respond, channel_id, db_manager):
 def get_bot_status(db_manager):
     """Get comprehensive bot status information."""
     try:
-        # Get all channels with kudos activity
+        # Get all channels with kudos activity OR custom configs
+        # This includes channels that override their leaderboard to another channel
         channels_query = """
         SELECT DISTINCT channel_id 
         FROM kudos 
+        UNION
+        SELECT DISTINCT channel_id 
+        FROM channel_configs
         ORDER BY channel_id
         """
         
@@ -103,12 +107,12 @@ def format_status_message(status_info, personality):
     message += f"🟢 *Status:* Online\n"
     message += f"⏰ *Checked:* {timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
     
-    # Channels
+    # Channels (combined from kudos activity and custom configs)
     if channels:
         channel_list = ", ".join([f"<#{ch}>" for ch in channels])
         message += f"📺 *Active Channels:* {channel_list}\n"
     else:
-        message += f"📺 *Active Channels:* None (no kudos sent yet)\n"
+        message += f"📺 *Active Channels:* None\n"
     
     # Last kudos
     if last_kudos:
