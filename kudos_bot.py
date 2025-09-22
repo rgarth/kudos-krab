@@ -8,7 +8,7 @@ from handlers.help_handler import show_help_message, get_app_mention_message
 from handlers.leaderboard_handler import handle_leaderboard_command
 from handlers.stats_handler import handle_stats_command
 from handlers.kudos_handler import handle_kudos_command
-from handlers.config_handler import handle_config_command, handle_config_modal_submission, show_current_config, reset_config_to_defaults
+from handlers.config_handler import handle_config_command, handle_config_modal_submission, show_current_config, reset_config_to_defaults, handle_personality_select
 from handlers.status_handler import handle_status_command
 
 # Configure logging
@@ -92,6 +92,11 @@ def handle_app_mention(event, say):
     channel_id = event.get('channel')
     say(get_app_mention_message(channel_id, db_manager))
 
+
+@app.action("personality_select")
+def handle_personality_select_wrapper(ack, body, client):
+    """Handle personality dropdown selection"""
+    handle_personality_select(ack, body, client, db_manager)
 
 @app.view("config_modal")
 def handle_config_modal_submission_wrapper(ack, body, client):

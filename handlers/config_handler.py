@@ -20,7 +20,6 @@ def handle_config_command(ack, command, client, db_manager):
     
     # Build personality options for dropdown
     personality_options = []
-    personality_descriptions = {}
     for personality in available_personalities:
         personality_options.append({
             "text": {
@@ -29,15 +28,6 @@ def handle_config_command(ack, command, client, db_manager):
             },
             "value": personality
         })
-        
-        # Load personality data to get description
-        try:
-            personality_data = load_personality(personality)
-            if personality_data and 'description' in personality_data:
-                personality_descriptions[personality] = personality_data['description']
-        except Exception as e:
-            logger.warning(f"Could not load description for personality {personality}: {e}")
-            personality_descriptions[personality] = None
     
     # Set current values
     current_personality = current_config['personality_name'] if current_config else DEFAULT_PERSONALITY
@@ -84,18 +74,27 @@ def handle_config_command(ack, command, client, db_manager):
             }
         })
         
-        # Add personality description
-        current_description = personality_descriptions.get(current_personality)
-        if current_description:
-            blocks.append({
-                "type": "context",
-                "elements": [
-                    {
-                        "type": "mrkdwn",
-                        "text": f"_{current_description}_"
-                    }
-                ]
-            })
+        # Add personality description block (will be updated dynamically)
+        try:
+            current_personality_data = load_personality(current_personality)
+            if current_personality_data and 'description' in current_personality_data:
+                description_text = current_personality_data['description']
+            else:
+                description_text = "No description available"
+        except Exception as e:
+            logger.warning(f"Could not load description for current personality {current_personality}: {e}")
+            description_text = "No description available"
+        
+        blocks.append({
+            "type": "context",
+            "block_id": "personality_description",
+            "elements": [
+                {
+                    "type": "mrkdwn",
+                    "text": f"_{description_text}_"
+                }
+            ]
+        })
     else:
         blocks.append({
             "type": "section",
@@ -330,3 +329,54 @@ def reset_config_to_defaults(respond, channel_id, db_manager):
     except Exception as e:
         logger.error(f"Error resetting config for {channel_id}: {e}")
         respond("❌ Failed to reset configuration. Please try again.")
+
+def handle_personality_select(ack, body, client, db_manager):
+    """Handle personality dropdown selection and update description dynamically"""
+    ack()
+    
+    try:
+        # Get the selected personality
+        selected_personality = body['actions'][0]['selected_option']['value']
+        
+        # Load the personality data to get description
+        personality_data = load_personality(selected_personality)
+        description_text = personality_data.get('description', 'No description available') if personality_data else 'No description available'
+        
+        # Get the current view
+        view = body['view']
+        
+        # Update the description block
+        updated_blocks = []
+        for block in view['blocks']:
+            if block.get('block_id') == 'personality_description':
+                # Update the description block
+                updated_blocks.append({
+                    "type": "context",
+                    "block_id": "personality_description",
+                    "elements": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"_{description_text}_"
+                        }
+                    ]
+                })
+            else:
+                # Keep other blocks unchanged
+                updated_blocks.append(block)
+        
+        # Update the view
+        client.views_update(
+            view_id=body['view']['id'],
+            view={
+                "type": "modal",
+                "callback_id": "config_modal",
+                "title": view['title'],
+                "blocks": updated_blocks,
+                "submit": view.get('submit'),
+                "close": view.get('close'),
+                "private_metadata": view.get('private_metadata', '')
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Error updating personality description: {e}")
