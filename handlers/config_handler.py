@@ -100,7 +100,7 @@ def handle_config_command(ack, command, client, db_manager):
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "*Personality*\n_Disabled - inherited from target channel_"
+                "text": "*Personality*\n_Disabled - inherited from source channel_"
             }
         })
     
@@ -128,7 +128,7 @@ def handle_config_command(ack, command, client, db_manager):
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": "*Monthly Quota*\n_Disabled - inherited from target channel_"
+                "text": "*Monthly Quota*\n_Disabled - inherited from source channel_"
             }
         })
     
@@ -147,7 +147,11 @@ def handle_config_command(ack, command, client, db_manager):
         },
         "label": {
             "type": "plain_text",
-            "text": "Leaderboard Channel Override (Optional)"
+            "text": "Use Another Channel's Leaderboard"
+        },
+        "hint": {
+            "type": "plain_text",
+            "text": "Enter a channel ID to use that channel's leaderboard instead of this one. This channel will inherit all settings from the source channel."
         },
         "optional": True
     })
@@ -288,10 +292,10 @@ def show_current_config(respond, channel_id, db_manager):
     
     if leaderboard_channel != "this channel":
         # Channel override is set - show inherited settings
-        target_config = db_manager.get_channel_config(leaderboard_channel)
-        if target_config:
-            inherited_personality = target_config['personality_name'] or DEFAULT_PERSONALITY
-            inherited_quota = target_config['monthly_quota'] or MONTHLY_QUOTA
+        source_config = db_manager.get_channel_config(leaderboard_channel)
+        if source_config:
+            inherited_personality = source_config['personality_name'] or DEFAULT_PERSONALITY
+            inherited_quota = source_config['monthly_quota'] or MONTHLY_QUOTA
         else:
             inherited_personality = DEFAULT_PERSONALITY
             inherited_quota = MONTHLY_QUOTA
