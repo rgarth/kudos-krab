@@ -21,7 +21,7 @@ def handle_status_command(ack, respond, channel_id, db_manager, client):
         status_info = get_bot_status(db_manager, client)
         
         # Format the status message
-        message = format_status_message(status_info, personality)
+        message = format_status_message(status_info, personality, db_manager)
         
         # Send response (ephemeral - only visible to the user)
         respond(message, response_type="ephemeral")
@@ -104,7 +104,7 @@ def get_bot_status(db_manager, client):
         logger.error(f"Failed to get bot status from database: {e}")
         raise
 
-def format_status_message(status_info, personality):
+def format_status_message(status_info, personality, db_manager):
     """Format the status information into a readable message."""
     bot_info = status_info['bot_info']
     channels = status_info['channels']
@@ -151,9 +151,28 @@ def format_status_message(status_info, personality):
     if config_channels:
         message += f"⚙️ *Custom Configurations:*\n"
         for channel_id, personality_name, quota, leaderboard in config_channels:
-            config_line = f"• <#{channel_id}>: {personality_name or 'default'}"
-            if quota:
-                config_line += f", quota: {quota}"
+            # Get effective values (inherited from override channel if applicable)
+            effective_channel = db_manager.get_effective_leaderboard_channel(channel_id)
+            effective_config = db_manager.get_channel_config(effective_channel)
+            
+            # Build config line
+            if effective_channel != channel_id:
+                # Channel inherits from another channel
+                config_line = f"• <#{channel_id}>: config from <#{effective_channel}>"
+            else:
+                # Own configuration - show the actual values
+                if effective_config and effective_config['personality_name']:
+                    effective_personality = effective_config['personality_name']
+                else:
+                    effective_personality = "default"
+                
+                if effective_config and effective_config['monthly_quota']:
+                    effective_quota = effective_config['monthly_quota']
+                else:
+                    effective_quota = "default"
+                
+                config_line = f"• <#{channel_id}>: {effective_personality}, quota: {effective_quota}"
+            
             if leaderboard:
                 config_line += f", leaderboard: <#{leaderboard}>"
             message += f"{config_line}\n"

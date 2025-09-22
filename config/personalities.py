@@ -42,7 +42,11 @@ def load_personality(personality_name=None):
 def load_personality_for_channel(channel_id, db_manager):
     """Load personality for a specific channel, falling back to default if not configured"""
     try:
-        config = db_manager.get_channel_config(channel_id)
+        # Check if this channel has a leaderboard override
+        effective_channel = db_manager.get_effective_leaderboard_channel(channel_id)
+        
+        # Get config from the effective channel (could be the same channel or override target)
+        config = db_manager.get_channel_config(effective_channel)
         if config and config['personality_name']:
             return load_personality(config['personality_name'])
     except Exception as e:
