@@ -1,5 +1,5 @@
 import logging
-from config.personalities import get_available_personalities, load_personality_for_channel
+from config.personalities import get_available_personalities, load_personality_for_channel, load_personality
 from config.settings import MONTHLY_QUOTA, DEFAULT_PERSONALITY
 
 logger = logging.getLogger(__name__)
@@ -20,6 +20,7 @@ def handle_config_command(ack, command, client, db_manager):
     
     # Build personality options for dropdown
     personality_options = []
+    personality_descriptions = {}
     for personality in available_personalities:
         personality_options.append({
             "text": {
@@ -28,6 +29,15 @@ def handle_config_command(ack, command, client, db_manager):
             },
             "value": personality
         })
+        
+        # Load personality data to get description
+        try:
+            personality_data = load_personality(personality)
+            if personality_data and 'description' in personality_data:
+                personality_descriptions[personality] = personality_data['description']
+        except Exception as e:
+            logger.warning(f"Could not load description for personality {personality}: {e}")
+            personality_descriptions[personality] = None
     
     # Set current values
     current_personality = current_config['personality_name'] if current_config else DEFAULT_PERSONALITY
@@ -73,6 +83,19 @@ def handle_config_command(ack, command, client, db_manager):
                 )
             }
         })
+        
+        # Add personality description
+        current_description = personality_descriptions.get(current_personality)
+        if current_description:
+            blocks.append({
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "mrkdwn",
+                        "text": f"_{current_description}_"
+                    }
+                ]
+            })
     else:
         blocks.append({
             "type": "section",
