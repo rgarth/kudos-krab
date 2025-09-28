@@ -30,6 +30,7 @@ def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=N
         effective_channel_id = db_manager.get_effective_leaderboard_channel(channel_id)
         
         # Get leaderboard data for the effective channel
+        # This will get data from effective_channel_id and use its leaderboard limit setting
         leaderboard_data = db_manager.get_monthly_leaderboard(target_month, target_year, effective_channel_id)
         
         # Use the data directly - trust the user IDs in the database

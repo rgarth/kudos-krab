@@ -1,6 +1,6 @@
 import logging
 from config.personalities import get_available_personalities, load_personality_for_channel, load_personality
-from config.settings import MONTHLY_QUOTA, DEFAULT_PERSONALITY
+from config.settings import MONTHLY_QUOTA, DEFAULT_PERSONALITY, LEADERBOARD_LIMIT
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,7 @@ def handle_config_command(ack, command, client, db_manager):
     # Set current values
     current_personality = current_config['personality_name'] if current_config else DEFAULT_PERSONALITY
     current_quota = current_config['monthly_quota'] if current_config else MONTHLY_QUOTA
+    current_limit = current_config['leaderboard_limit'] if current_config else LEADERBOARD_LIMIT
     override_channel_id = current_config['leaderboard_channel_id'] if current_config else ""
     
     # Check if channel override is active
@@ -132,6 +133,38 @@ def handle_config_command(ack, command, client, db_manager):
             }
         })
     
+    # Add leaderboard limit block
+    if not has_override:
+        blocks.append({
+            "type": "input",
+            "block_id": "limit_block",
+            "element": {
+                "type": "plain_text_input",
+                "action_id": "limit_input",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Enter leaderboard limit"
+                },
+                "initial_value": str(current_limit) if current_limit is not None else ""
+            },
+            "label": {
+                "type": "plain_text",
+                "text": "Leaderboard Limit"
+            },
+            "hint": {
+                "type": "plain_text",
+                "text": f"Number of users to show in leaderboards (default: {LEADERBOARD_LIMIT})"
+            }
+        })
+    else:
+        blocks.append({
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Leaderboard Limit*\n_Disabled - inherited from source channel_"
+            }
+        })
+    
     # Add leaderboard block
     blocks.append({
         "type": "input",
@@ -216,6 +249,7 @@ def handle_config_modal_submission(ack, body, client, db_manager):
     # Extract values from the modal
     personality = None
     quota = None
+    leaderboard_limit = None
     leaderboard_channel = None
     
     # Get personality selection - need to find the block with the select
@@ -227,6 +261,11 @@ def handle_config_modal_submission(ack, body, client, db_manager):
                 quota = int(block_values['quota_input']['value'])
             except (ValueError, KeyError):
                 quota = None
+        elif 'limit_input' in block_values:
+            try:
+                leaderboard_limit = int(block_values['limit_input']['value'])
+            except (ValueError, KeyError):
+                leaderboard_limit = None
         elif 'leaderboard_input' in block_values:
             leaderboard_value = block_values['leaderboard_input']['value']
             if leaderboard_value:
@@ -236,17 +275,19 @@ def handle_config_modal_submission(ack, body, client, db_manager):
             else:
                 leaderboard_channel = None
     
-    # If channel override is set, ignore personality and quota (they're inherited)
+    # If channel override is set, ignore personality, quota, and limit (they're inherited)
     if leaderboard_channel:
         personality = None
         quota = None
+        leaderboard_limit = None
     
     # Save configuration
     success = db_manager.save_channel_config(
         channel_id=channel_id,
         personality_name=personality,
         monthly_quota=quota,
-        leaderboard_channel_id=leaderboard_channel
+        leaderboard_channel_id=leaderboard_channel,
+        leaderboard_limit=leaderboard_limit
     )
     
     if success:
@@ -254,12 +295,14 @@ def handle_config_modal_submission(ack, body, client, db_manager):
         user_id = body['user']['id']
         personality_name = personality or DEFAULT_PERSONALITY
         quota_text = f"{quota}" if quota else str(MONTHLY_QUOTA)
+        limit_text = f"{leaderboard_limit}" if leaderboard_limit else str(LEADERBOARD_LIMIT)
         leaderboard_text = f"<#{leaderboard_channel}>" if leaderboard_channel else "this channel"
         
         message = f"""✅ *Configuration saved for <#{channel_id}>*
 
 • *Personality:* {personality_name.title()}
 • *Monthly Quota:* {quota_text}
+• *Leaderboard Limit:* {limit_text}
 • *Leaderboard:* {leaderboard_text}
 
 Settings will take effect immediately! 🦀"""
@@ -288,6 +331,7 @@ def show_current_config(respond, channel_id, db_manager):
     
     personality_name = config['personality_name'] or DEFAULT_PERSONALITY
     quota = config['monthly_quota'] or MONTHLY_QUOTA
+    limit = config['leaderboard_limit'] or LEADERBOARD_LIMIT
     leaderboard_channel = config['leaderboard_channel_id'] or "this channel"
     
     if leaderboard_channel != "this channel":
@@ -296,9 +340,11 @@ def show_current_config(respond, channel_id, db_manager):
         if source_config:
             inherited_personality = source_config['personality_name'] or DEFAULT_PERSONALITY
             inherited_quota = source_config['monthly_quota'] or MONTHLY_QUOTA
+            inherited_limit = source_config['leaderboard_limit'] or LEADERBOARD_LIMIT
         else:
             inherited_personality = DEFAULT_PERSONALITY
             inherited_quota = MONTHLY_QUOTA
+            inherited_limit = LEADERBOARD_LIMIT
         
         message = f"""📋 *Current Configuration for <#{channel_id}>*
 
@@ -306,6 +352,7 @@ def show_current_config(respond, channel_id, db_manager):
 • *Leaderboard:* <#{leaderboard_channel}>
 • *Personality:* {inherited_personality.title()} (inherited from <#{leaderboard_channel}>)
 • *Monthly Quota:* {inherited_quota} (inherited from <#{leaderboard_channel}>)
+• *Leaderboard Limit:* {inherited_limit} (inherited from <#{leaderboard_channel}>)
 
 Use `/kk config edit` to modify these settings."""
     else:
@@ -314,6 +361,7 @@ Use `/kk config edit` to modify these settings."""
 
 • *Personality:* {personality_name.title()}
 • *Monthly Quota:* {quota}
+• *Leaderboard Limit:* {limit}
 • *Leaderboard:* {leaderboard_channel}
 
 Use `/kk config edit` to modify these settings."""

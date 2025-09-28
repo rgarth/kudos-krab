@@ -70,6 +70,7 @@ class DatabaseManager:
             personality_name VARCHAR(255),
             monthly_quota INTEGER,
             leaderboard_channel_id VARCHAR(255),
+            leaderboard_limit INTEGER,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -161,6 +162,13 @@ class DatabaseManager:
     
     def get_monthly_leaderboard(self, month: int, year: int, channel_id: str = None):
         """Get monthly leaderboard for senders and receivers in a specific channel"""
+        # Get channel-specific limit or use global default
+        limit = LEADERBOARD_LIMIT
+        if channel_id:
+            config = self.get_channel_config(channel_id)
+            if config and config.get('leaderboard_limit'):
+                limit = config['leaderboard_limit']
+            
         if channel_id:
             sender_sql = """
             SELECT sender, COUNT(*) as count 
@@ -184,7 +192,7 @@ class DatabaseManager:
             LIMIT %s
             """
             
-            params = (channel_id, month, year, LEADERBOARD_LIMIT)
+            params = (channel_id, month, year, limit)
         else:
             sender_sql = """
             SELECT sender, COUNT(*) as count 
@@ -206,7 +214,7 @@ class DatabaseManager:
             LIMIT %s
             """
             
-            params = (month, year, LEADERBOARD_LIMIT)
+            params = (month, year, limit)
         
         with self.get_connection() as conn:
             with conn.cursor() as cursor:
@@ -281,7 +289,7 @@ class DatabaseManager:
     def get_channel_config(self, channel_id: str):
         """Get configuration for a specific channel"""
         sql = """
-        SELECT personality_name, monthly_quota, leaderboard_channel_id, created_at, updated_at
+        SELECT personality_name, monthly_quota, leaderboard_channel_id, leaderboard_limit, created_at, updated_at
         FROM channel_configs 
         WHERE channel_id = %s
         """
@@ -295,32 +303,35 @@ class DatabaseManager:
                         'personality_name': result[0],
                         'monthly_quota': result[1],
                         'leaderboard_channel_id': result[2],
-                        'created_at': result[3],
-                        'updated_at': result[4]
+                        'leaderboard_limit': result[3],
+                        'created_at': result[4],
+                        'updated_at': result[5]
                     }
                 return None
     
     def save_channel_config(self, channel_id: str, personality_name: str = None, 
-                           monthly_quota: int = None, leaderboard_channel_id: str = None):
+                           monthly_quota: int = None, leaderboard_channel_id: str = None, 
+                           leaderboard_limit: int = None):
         """Save or update channel configuration using UPSERT"""
         sql = """
-        INSERT INTO channel_configs (channel_id, personality_name, monthly_quota, leaderboard_channel_id, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO channel_configs (channel_id, personality_name, monthly_quota, leaderboard_channel_id, leaderboard_limit, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         ON CONFLICT (channel_id) 
         DO UPDATE SET 
             personality_name = COALESCE(EXCLUDED.personality_name, channel_configs.personality_name),
             monthly_quota = COALESCE(EXCLUDED.monthly_quota, channel_configs.monthly_quota),
             leaderboard_channel_id = COALESCE(EXCLUDED.leaderboard_channel_id, channel_configs.leaderboard_channel_id),
+            leaderboard_limit = COALESCE(EXCLUDED.leaderboard_limit, channel_configs.leaderboard_limit),
             updated_at = CURRENT_TIMESTAMP
         """
-        params = (channel_id, personality_name, monthly_quota, leaderboard_channel_id)
+        params = (channel_id, personality_name, monthly_quota, leaderboard_channel_id, leaderboard_limit)
         
         try:
             with self.get_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(sql, params)
                     conn.commit()
-                    logger.info(f"Channel config saved for {channel_id}: personality={personality_name}, quota={monthly_quota}, leaderboard={leaderboard_channel_id}")
+                    logger.info(f"Channel config saved for {channel_id}: personality={personality_name}, quota={monthly_quota}, leaderboard={leaderboard_channel_id}, limit={leaderboard_limit}")
                     return True
         except Exception as e:
             logger.error(f"Failed to save channel config: {e}")
