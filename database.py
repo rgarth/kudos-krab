@@ -226,9 +226,44 @@ class DatabaseManager:
                 cursor.execute(receiver_sql, params)
                 top_receivers = cursor.fetchall()
                 
+        return {
+            'senders': top_senders,
+            'receivers': top_receivers
+        }
+    
+    def get_complete_monthly_leaderboard(self, month: int, year: int, channel_id: str = None):
+        """Get complete monthly leaderboard for all users who received kudos (no limit)"""
+        if channel_id:
+            receiver_sql = """
+            SELECT receiver, COUNT(*) as count 
+            FROM kudos 
+            WHERE channel_id = %s
+            AND EXTRACT(MONTH FROM timestamp) = %s 
+            AND EXTRACT(YEAR FROM timestamp) = %s
+            GROUP BY receiver 
+            ORDER BY count DESC
+            """
+            params = (channel_id, month, year)
+        else:
+            receiver_sql = """
+            SELECT receiver, COUNT(*) as count 
+            FROM kudos 
+            WHERE EXTRACT(MONTH FROM timestamp) = %s 
+            AND EXTRACT(YEAR FROM timestamp) = %s
+            GROUP BY receiver 
+            ORDER BY count DESC
+            """
+            params = (month, year)
+        
+        with self.get_connection() as conn:
+            with conn.cursor() as cursor:
+                # Get all receivers (no limit)
+                cursor.execute(receiver_sql, params)
+                all_receivers = cursor.fetchall()
+                
                 return {
-                    'senders': top_senders,
-                    'receivers': top_receivers
+                    'senders': [],  # Not needed for complete view
+                    'receivers': all_receivers
                 }
     
     def get_user_stats(self, user: str, channel_id: str = None):

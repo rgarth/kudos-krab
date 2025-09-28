@@ -10,28 +10,42 @@ logger = logging.getLogger(__name__)
 def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=None, say=None):
     """Handle leaderboard request with optional month/year parameters and public posting"""
     try:
-        # Check for public flag
+        # Check for public flag and complete flag
         is_public = False
+        is_complete = False
         if params:
             params_lower = params.lower()
             if "public" in params_lower or "share" in params_lower:
                 is_public = True
                 # Remove public/share keywords from params for date parsing
                 params = params_lower.replace("public", "").replace("share", "").strip()
+            if "complete" in params_lower:
+                is_complete = True
+                # Remove complete keyword from params for date parsing
+                params = params_lower.replace("complete", "").strip()
         
         # Parse month and year from parameters
         month, year = parse_month_year(params)
         target_month, target_year = get_target_date(month, year)
         
+        # Complete leaderboard only works for current month
+        if is_complete and (month is not None or year is not None):
+            respond("❌ Complete leaderboard is only available for the current month.")
+            return
+        
         # Log the parsing results for debugging
-        logger.info(f"Leaderboard request - params: '{params}', parsed: month={month}, year={year}, target: {target_month}/{target_year}, channel: {channel_id}, public: {is_public}")
+        logger.info(f"Leaderboard request - params: '{params}', parsed: month={month}, year={year}, target: {target_month}/{target_year}, channel: {channel_id}, public: {is_public}, complete: {is_complete}")
         
         # Get effective leaderboard channel (handles channel overrides)
         effective_channel_id = db_manager.get_effective_leaderboard_channel(channel_id)
         
         # Get leaderboard data for the effective channel
-        # This will get data from effective_channel_id and use its leaderboard limit setting
-        leaderboard_data = db_manager.get_monthly_leaderboard(target_month, target_year, effective_channel_id)
+        if is_complete:
+            # Get complete leaderboard (all users, no limit) - current month only
+            leaderboard_data = db_manager.get_complete_monthly_leaderboard(target_month, target_year, effective_channel_id)
+        else:
+            # Get regular leaderboard with channel-specific limit
+            leaderboard_data = db_manager.get_monthly_leaderboard(target_month, target_year, effective_channel_id)
         
         # Use the data directly - trust the user IDs in the database
         formatted_leaderboard = format_leaderboard(leaderboard_data, target_month, target_year, channel_id, db_manager)
