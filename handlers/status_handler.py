@@ -6,6 +6,7 @@ Shows bot health, installed channels, and operational statistics.
 import logging
 from datetime import datetime
 from config.personalities import load_personality_for_channel
+from version import VERSION
 
 logger = logging.getLogger(__name__)
 
@@ -111,6 +112,7 @@ def format_status_message(status_info, personality, db_manager):
     # Bot status
     message = f"🤖 *Kudos Krab Bot Status*\n"
     message += f"🟢 *Status:* Online\n"
+    message += f"📦 *Version:* {VERSION}\n"
     message += f"⏰ *Checked:* {timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')}\n"
     message += f"🏢 *Workspace:* {bot_info.get('team', 'Unknown')}\n"
     message += f"🔗 *URL:* {bot_info.get('url', 'Unknown')}\n"

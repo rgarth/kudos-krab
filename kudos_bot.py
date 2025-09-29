@@ -77,6 +77,10 @@ def handle_kudos_command_wrapper(ack, command, say, respond):
         elif first_word == "status":
             handle_status_command(ack, respond, channel_id, db_manager, app.client)
             return
+        elif first_word == "version":
+            from version import VERSION
+            respond(f"📦 *Kudos Krab Version:* {VERSION}")
+            return
         elif len(text.split()) == 1:
             # Single word that's not a recognized command - show help
             show_help_message(respond, channel_id, db_manager)
