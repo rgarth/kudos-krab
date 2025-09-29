@@ -33,61 +33,56 @@ def handle_status_command(ack, respond, channel_id, db_manager, client):
 def get_bot_status(db_manager, client):
     """Get comprehensive bot status information."""
     try:
-        # Get bot authentication info
-        auth_response = client.auth_test()
-        bot_info = {
-            'bot_id': auth_response.get('bot_id'),
-            'user_id': auth_response.get('user_id'),
-            'team': auth_response.get('team'),
-            'team_id': auth_response.get('team_id'),
-            'url': auth_response.get('url')
-        }
-        # Get all channels with kudos activity OR custom configs
-        # This includes channels that override their leaderboard to another channel
-        channels_query = """
-        SELECT DISTINCT channel_id 
-        FROM kudos 
-        UNION
-        SELECT DISTINCT channel_id 
-        FROM channel_configs
-        ORDER BY channel_id
-        """
+        # Get bot authentication info (with error handling to prevent hanging)
+        bot_info = {'bot_id': 'Unknown', 'user_id': 'Unknown', 'team': 'Unknown', 'team_id': 'Unknown', 'url': 'Unknown'}
+        try:
+            auth_response = client.auth_test()
+            bot_info = {
+                'bot_id': auth_response.get('bot_id', 'Unknown'),
+                'user_id': auth_response.get('user_id', 'Unknown'),
+                'team': auth_response.get('team', 'Unknown'),
+                'team_id': auth_response.get('team_id', 'Unknown'),
+                'url': auth_response.get('url', 'Unknown')
+            }
+        except Exception as e:
+            logger.warning(f"Failed to get bot auth info: {e}")
         
+        # Use single database connection for all queries
         with db_manager.get_connection() as conn:
             with conn.cursor() as cursor:
+                # Get all channels with kudos activity OR custom configs
+                channels_query = """
+                SELECT DISTINCT channel_id 
+                FROM kudos 
+                UNION
+                SELECT DISTINCT channel_id 
+                FROM channel_configs
+                ORDER BY channel_id
+                """
                 cursor.execute(channels_query)
                 channels = [row[0] for row in cursor.fetchall()]
-        
-        # Get last kudos timestamp
-        last_kudos_query = """
-        SELECT timestamp, channel_id, sender, receiver
-        FROM kudos 
-        ORDER BY timestamp DESC 
-        LIMIT 1
-        """
-        
-        with db_manager.get_connection() as conn:
-            with conn.cursor() as cursor:
+                
+                # Get last kudos timestamp
+                last_kudos_query = """
+                SELECT timestamp, channel_id, sender, receiver
+                FROM kudos 
+                ORDER BY timestamp DESC 
+                LIMIT 1
+                """
                 cursor.execute(last_kudos_query)
                 last_kudos_row = cursor.fetchone()
-        
-        # Get total kudos count
-        total_kudos_query = "SELECT COUNT(*) FROM kudos"
-        
-        with db_manager.get_connection() as conn:
-            with conn.cursor() as cursor:
+                
+                # Get total kudos count
+                total_kudos_query = "SELECT COUNT(*) FROM kudos"
                 cursor.execute(total_kudos_query)
                 total_kudos = cursor.fetchone()[0]
-        
-        # Get channels with custom configs
-        config_channels_query = """
-        SELECT channel_id, personality_name, monthly_quota, leaderboard_channel_id
-        FROM channel_configs
-        ORDER BY channel_id
-        """
-        
-        with db_manager.get_connection() as conn:
-            with conn.cursor() as cursor:
+                
+                # Get channels with custom configs
+                config_channels_query = """
+                SELECT channel_id, personality_name, monthly_quota, leaderboard_channel_id
+                FROM channel_configs
+                ORDER BY channel_id
+                """
                 cursor.execute(config_channels_query)
                 config_channels = cursor.fetchall()
         
