@@ -32,7 +32,7 @@ def handle_config_command(ack, command, client, db_manager):
     
     # Build timezone options for dropdown
     timezone_options = []
-    for offset in range(-11, 12):  # UTC-11 to UTC+11
+    for offset in range(-12, 15):  # UTC-12 to UTC+14
         if offset == 0:
             timezone_options.append({
                 "text": {
@@ -213,7 +213,7 @@ def handle_config_command(ack, command, client, db_manager):
                 "action_id": "timezone_select",
                 "initial_option": next(
                     (opt for opt in timezone_options if opt["value"] == current_timezone),
-                    timezone_options[11]  # Default to UTC if not found
+                    timezone_options[12]  # Default to UTC if not found (UTC is at index 12)
                 )
             }
         })
