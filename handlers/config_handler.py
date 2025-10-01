@@ -37,7 +37,7 @@ def handle_config_command(ack, command, client, db_manager):
             timezone_options.append({
                 "text": {
                     "type": "plain_text",
-                    "text": "UTC (GMT+0)"
+                    "text": "UTC"
                 },
                 "value": "UTC"
             })
@@ -45,7 +45,7 @@ def handle_config_command(ack, command, client, db_manager):
             timezone_options.append({
                 "text": {
                     "type": "plain_text",
-                    "text": f"UTC+{offset} (GMT+{offset})"
+                    "text": f"UTC+{offset}"
                 },
                 "value": f"UTC+{offset}"
             })
@@ -53,7 +53,7 @@ def handle_config_command(ack, command, client, db_manager):
             timezone_options.append({
                 "text": {
                     "type": "plain_text",
-                    "text": f"UTC{offset} (GMT{offset})"
+                    "text": f"UTC{offset}"
                 },
                 "value": f"UTC{offset}"
             })
