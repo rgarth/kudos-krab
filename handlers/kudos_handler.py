@@ -66,8 +66,7 @@ def handle_kudos_command(command, say, respond, app, db_manager):
         return True
     
     # Check monthly quota for multiple kudos
-    current_month = datetime.now().month
-    current_year = datetime.now().year
+    current_month, current_year = db_manager.get_current_month_year_in_timezone(channel_id)
     monthly_count = db_manager.get_monthly_kudos_count(user_id, current_month, current_year, channel_id)
     kudos_needed = len(unique_users)
     

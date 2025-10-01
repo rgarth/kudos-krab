@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 def handle_stats_command(user_id, respond, db_manager, channel_id=None):
     """Handle stats request"""
     try:
-        current_month = datetime.now().month
-        current_year = datetime.now().year
+        # Use timezone-aware current month/year
+        current_month, current_year = db_manager.get_current_month_year_in_timezone(channel_id)
         monthly_sent = db_manager.get_monthly_kudos_count(user_id, current_month, current_year, channel_id)
         monthly_received = db_manager.get_monthly_kudos_received_count(user_id, current_month, current_year, channel_id)
         

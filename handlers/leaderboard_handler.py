@@ -26,7 +26,12 @@ def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=N
         
         # Parse month and year from parameters
         month, year = parse_month_year(params)
-        target_month, target_year = get_target_date(month, year)
+        
+        # If no specific month/year provided, use current month/year in channel's timezone
+        if month is None and year is None:
+            target_month, target_year = db_manager.get_current_month_year_in_timezone(channel_id)
+        else:
+            target_month, target_year = get_target_date(month, year)
         
         # Complete leaderboard only works for current month
         if is_complete and (month is not None or year is not None):

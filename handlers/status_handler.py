@@ -80,7 +80,7 @@ def get_bot_status(db_manager, client):
                 
                 # Get channels with custom configs
                 config_channels_query = """
-                SELECT channel_id, personality_name, monthly_quota, leaderboard_channel_id
+                SELECT channel_id, personality_name, monthly_quota, leaderboard_channel_id, timezone
                 FROM channel_configs
                 ORDER BY channel_id
                 """
@@ -147,7 +147,7 @@ def format_status_message(status_info, personality, db_manager):
     # Custom configurations
     if config_channels:
         message += f"⚙️ *Custom Configurations:*\n"
-        for channel_id, personality_name, quota, leaderboard in config_channels:
+        for channel_id, personality_name, quota, leaderboard, timezone in config_channels:
             # Get effective values (inherited from override channel if applicable)
             effective_channel = db_manager.get_effective_leaderboard_channel(channel_id)
             effective_config = db_manager.get_channel_config(effective_channel)
@@ -168,7 +168,12 @@ def format_status_message(status_info, personality, db_manager):
                 else:
                     effective_quota = "default"
                 
-                config_line = f"• <#{channel_id}>: {effective_personality}, quota: {effective_quota}"
+                if effective_config and effective_config['timezone']:
+                    effective_timezone = effective_config['timezone']
+                else:
+                    effective_timezone = "default"
+                
+                config_line = f"• <#{channel_id}>: {effective_personality}, quota: {effective_quota}, tz: {effective_timezone}"
             
             if leaderboard:
                 config_line += f", leaderboard: <#{leaderboard}>"

@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2 import pool
 from contextlib import contextmanager
 import logging
+from datetime import datetime, timezone, timedelta
 from config.settings import LEADERBOARD_LIMIT
 
 logger = logging.getLogger(__name__)
@@ -71,6 +72,7 @@ class DatabaseManager:
             monthly_quota INTEGER,
             leaderboard_channel_id VARCHAR(255),
             leaderboard_limit INTEGER,
+            timezone VARCHAR(10),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -108,25 +110,20 @@ class DatabaseManager:
             logger.error(f"Failed to record kudos: {e}")
             return False
     
-    def get_monthly_kudos_count(self, user: str, month: int, year: int, channel_id: str = None) -> int:
+    def get_monthly_kudos_count(self, user: str, month: int, year: int, channel_id: str) -> int:
         """Get the number of kudos sent by a user in a specific month and channel"""
-        if channel_id:
-            sql = """
-            SELECT COUNT(*) FROM kudos 
-            WHERE sender = %s 
-            AND channel_id = %s
-            AND EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            """
-            params = (user, channel_id, month, year)
-        else:
-            sql = """
-            SELECT COUNT(*) FROM kudos 
-            WHERE sender = %s 
-            AND EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            """
-            params = (user, month, year)
+        # Use timezone-aware query
+        tz_str = self.get_channel_timezone(channel_id)
+        offset_hours = self.get_timezone_offset(tz_str)
+        
+        sql = """
+        SELECT COUNT(*) FROM kudos 
+        WHERE sender = %s 
+        AND channel_id = %s
+        AND EXTRACT(MONTH FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s 
+        AND EXTRACT(YEAR FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s
+        """
+        params = (user, channel_id, offset_hours, month, offset_hours, year)
         
         with self.get_connection() as conn:
             with conn.cursor() as cursor:
@@ -134,25 +131,20 @@ class DatabaseManager:
                 result = cursor.fetchone()
                 return result[0] if result else 0
     
-    def get_monthly_kudos_received_count(self, user: str, month: int, year: int, channel_id: str = None) -> int:
+    def get_monthly_kudos_received_count(self, user: str, month: int, year: int, channel_id: str) -> int:
         """Get the number of kudos received by a user in a specific month and channel"""
-        if channel_id:
-            sql = """
-            SELECT COUNT(*) FROM kudos 
-            WHERE receiver = %s 
-            AND channel_id = %s
-            AND EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            """
-            params = (user, channel_id, month, year)
-        else:
-            sql = """
-            SELECT COUNT(*) FROM kudos 
-            WHERE receiver = %s 
-            AND EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            """
-            params = (user, month, year)
+        # Use timezone-aware query
+        tz_str = self.get_channel_timezone(channel_id)
+        offset_hours = self.get_timezone_offset(tz_str)
+        
+        sql = """
+        SELECT COUNT(*) FROM kudos 
+        WHERE receiver = %s 
+        AND channel_id = %s
+        AND EXTRACT(MONTH FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s 
+        AND EXTRACT(YEAR FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s
+        """
+        params = (user, channel_id, offset_hours, month, offset_hours, year)
         
         with self.get_connection() as conn:
             with conn.cursor() as cursor:
@@ -160,61 +152,41 @@ class DatabaseManager:
                 result = cursor.fetchone()
                 return result[0] if result else 0
     
-    def get_monthly_leaderboard(self, month: int, year: int, channel_id: str = None):
+    def get_monthly_leaderboard(self, month: int, year: int, channel_id: str):
         """Get monthly leaderboard for senders and receivers in a specific channel"""
         # Get channel-specific limit or use global default
         limit = LEADERBOARD_LIMIT
-        if channel_id:
-            config = self.get_channel_config(channel_id)
-            if config and config.get('leaderboard_limit'):
-                limit = config['leaderboard_limit']
-            
-        if channel_id:
-            sender_sql = """
-            SELECT sender, COUNT(*) as count 
-            FROM kudos 
-            WHERE channel_id = %s
-            AND EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            GROUP BY sender 
-            ORDER BY count DESC 
-            LIMIT %s
-            """
-            
-            receiver_sql = """
-            SELECT receiver, COUNT(*) as count 
-            FROM kudos 
-            WHERE channel_id = %s
-            AND EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            GROUP BY receiver 
-            ORDER BY count DESC 
-            LIMIT %s
-            """
-            
-            params = (channel_id, month, year, limit)
-        else:
-            sender_sql = """
-            SELECT sender, COUNT(*) as count 
-            FROM kudos 
-            WHERE EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            GROUP BY sender 
-            ORDER BY count DESC 
-            LIMIT %s
-            """
-            
-            receiver_sql = """
-            SELECT receiver, COUNT(*) as count 
-            FROM kudos 
-            WHERE EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            GROUP BY receiver 
-            ORDER BY count DESC 
-            LIMIT %s
-            """
-            
-            params = (month, year, limit)
+        config = self.get_channel_config(channel_id)
+        if config and config.get('leaderboard_limit'):
+            limit = config['leaderboard_limit']
+        
+        # Use timezone-aware query
+        tz_str = self.get_channel_timezone(channel_id)
+        offset_hours = self.get_timezone_offset(tz_str)
+        
+        sender_sql = """
+        SELECT sender, COUNT(*) as count 
+        FROM kudos 
+        WHERE channel_id = %s
+        AND EXTRACT(MONTH FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s 
+        AND EXTRACT(YEAR FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s
+        GROUP BY sender 
+        ORDER BY count DESC 
+        LIMIT %s
+        """
+        
+        receiver_sql = """
+        SELECT receiver, COUNT(*) as count 
+        FROM kudos 
+        WHERE channel_id = %s
+        AND EXTRACT(MONTH FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s 
+        AND EXTRACT(YEAR FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s
+        GROUP BY receiver 
+        ORDER BY count DESC 
+        LIMIT %s
+        """
+        
+        params = (channel_id, offset_hours, month, offset_hours, year, limit)
         
         with self.get_connection() as conn:
             with conn.cursor() as cursor:
@@ -231,48 +203,32 @@ class DatabaseManager:
             'receivers': top_receivers
         }
     
-    def get_complete_monthly_leaderboard(self, month: int, year: int, channel_id: str = None):
+    def get_complete_monthly_leaderboard(self, month: int, year: int, channel_id: str):
         """Get complete monthly leaderboard for all users who sent/received kudos (no limit)"""
-        if channel_id:
-            sender_sql = """
-            SELECT sender, COUNT(*) as count 
-            FROM kudos 
-            WHERE channel_id = %s
-            AND EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            GROUP BY sender 
-            ORDER BY count DESC
-            """
-            
-            receiver_sql = """
-            SELECT receiver, COUNT(*) as count 
-            FROM kudos 
-            WHERE channel_id = %s
-            AND EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            GROUP BY receiver 
-            ORDER BY count DESC
-            """
-            params = (channel_id, month, year)
-        else:
-            sender_sql = """
-            SELECT sender, COUNT(*) as count 
-            FROM kudos 
-            WHERE EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            GROUP BY sender 
-            ORDER BY count DESC
-            """
-            
-            receiver_sql = """
-            SELECT receiver, COUNT(*) as count 
-            FROM kudos 
-            WHERE EXTRACT(MONTH FROM timestamp) = %s 
-            AND EXTRACT(YEAR FROM timestamp) = %s
-            GROUP BY receiver 
-            ORDER BY count DESC
-            """
-            params = (month, year)
+        # Use timezone-aware query
+        tz_str = self.get_channel_timezone(channel_id)
+        offset_hours = self.get_timezone_offset(tz_str)
+        
+        sender_sql = """
+        SELECT sender, COUNT(*) as count 
+        FROM kudos 
+        WHERE channel_id = %s
+        AND EXTRACT(MONTH FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s 
+        AND EXTRACT(YEAR FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s
+        GROUP BY sender 
+        ORDER BY count DESC
+        """
+        
+        receiver_sql = """
+        SELECT receiver, COUNT(*) as count 
+        FROM kudos 
+        WHERE channel_id = %s
+        AND EXTRACT(MONTH FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s 
+        AND EXTRACT(YEAR FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = %s
+        GROUP BY receiver 
+        ORDER BY count DESC
+        """
+        params = (channel_id, offset_hours, month, offset_hours, year)
         
         with self.get_connection() as conn:
             with conn.cursor() as cursor:
@@ -289,43 +245,29 @@ class DatabaseManager:
                     'receivers': all_receivers
                 }
     
-    def get_user_stats(self, user: str, channel_id: str = None):
+    def get_user_stats(self, user: str, channel_id: str):
         """Get kudos statistics for a specific user in a specific channel"""
-        if channel_id:
-            sent_sql = """
-            SELECT COUNT(*) FROM kudos WHERE sender = %s AND channel_id = %s
-            """
-            
-            received_sql = """
-            SELECT COUNT(*) FROM kudos WHERE receiver = %s AND channel_id = %s
-            """
-            
-            monthly_sent_sql = """
-            SELECT COUNT(*) FROM kudos 
-            WHERE sender = %s 
-            AND channel_id = %s
-            AND EXTRACT(MONTH FROM timestamp) = EXTRACT(MONTH FROM CURRENT_DATE)
-            AND EXTRACT(YEAR FROM timestamp) = EXTRACT(YEAR FROM CURRENT_DATE)
-            """
-            
-            params = (user, channel_id)
-        else:
-            sent_sql = """
-            SELECT COUNT(*) FROM kudos WHERE sender = %s
-            """
-            
-            received_sql = """
-            SELECT COUNT(*) FROM kudos WHERE receiver = %s
-            """
-            
-            monthly_sent_sql = """
-            SELECT COUNT(*) FROM kudos 
-            WHERE sender = %s 
-            AND EXTRACT(MONTH FROM timestamp) = EXTRACT(MONTH FROM CURRENT_DATE)
-            AND EXTRACT(YEAR FROM timestamp) = EXTRACT(YEAR FROM CURRENT_DATE)
-            """
-            
-            params = (user,)
+        sent_sql = """
+        SELECT COUNT(*) FROM kudos WHERE sender = %s AND channel_id = %s
+        """
+        
+        received_sql = """
+        SELECT COUNT(*) FROM kudos WHERE receiver = %s AND channel_id = %s
+        """
+        
+        # Use timezone-aware query for monthly stats
+        tz_str = self.get_channel_timezone(channel_id)
+        offset_hours = self.get_timezone_offset(tz_str)
+        
+        monthly_sent_sql = """
+        SELECT COUNT(*) FROM kudos 
+        WHERE sender = %s 
+        AND channel_id = %s
+        AND EXTRACT(MONTH FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = EXTRACT(MONTH FROM CURRENT_DATE AT TIME ZONE 'UTC' + INTERVAL '%s hours')
+        AND EXTRACT(YEAR FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = EXTRACT(YEAR FROM CURRENT_DATE AT TIME ZONE 'UTC' + INTERVAL '%s hours')
+        """
+        
+        params = (user, channel_id, offset_hours, offset_hours, offset_hours, offset_hours)
         
         with self.get_connection() as conn:
             with conn.cursor() as cursor:
@@ -347,7 +289,7 @@ class DatabaseManager:
     def get_channel_config(self, channel_id: str):
         """Get configuration for a specific channel"""
         sql = """
-        SELECT personality_name, monthly_quota, leaderboard_channel_id, leaderboard_limit, created_at, updated_at
+        SELECT personality_name, monthly_quota, leaderboard_channel_id, leaderboard_limit, timezone, created_at, updated_at
         FROM channel_configs 
         WHERE channel_id = %s
         """
@@ -362,34 +304,36 @@ class DatabaseManager:
                         'monthly_quota': result[1],
                         'leaderboard_channel_id': result[2],
                         'leaderboard_limit': result[3],
-                        'created_at': result[4],
-                        'updated_at': result[5]
+                        'timezone': result[4],
+                        'created_at': result[5],
+                        'updated_at': result[6]
                     }
                 return None
     
     def save_channel_config(self, channel_id: str, personality_name: str = None, 
                            monthly_quota: int = None, leaderboard_channel_id: str = None, 
-                           leaderboard_limit: int = None):
+                           leaderboard_limit: int = None, timezone: str = None):
         """Save or update channel configuration using UPSERT"""
         sql = """
-        INSERT INTO channel_configs (channel_id, personality_name, monthly_quota, leaderboard_channel_id, leaderboard_limit, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO channel_configs (channel_id, personality_name, monthly_quota, leaderboard_channel_id, leaderboard_limit, timezone, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         ON CONFLICT (channel_id) 
         DO UPDATE SET 
             personality_name = COALESCE(EXCLUDED.personality_name, channel_configs.personality_name),
             monthly_quota = COALESCE(EXCLUDED.monthly_quota, channel_configs.monthly_quota),
             leaderboard_channel_id = COALESCE(EXCLUDED.leaderboard_channel_id, channel_configs.leaderboard_channel_id),
             leaderboard_limit = COALESCE(EXCLUDED.leaderboard_limit, channel_configs.leaderboard_limit),
+            timezone = COALESCE(EXCLUDED.timezone, channel_configs.timezone),
             updated_at = CURRENT_TIMESTAMP
         """
-        params = (channel_id, personality_name, monthly_quota, leaderboard_channel_id, leaderboard_limit)
+        params = (channel_id, personality_name, monthly_quota, leaderboard_channel_id, leaderboard_limit, timezone)
         
         try:
             with self.get_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute(sql, params)
                     conn.commit()
-                    logger.info(f"Channel config saved for {channel_id}: personality={personality_name}, quota={monthly_quota}, leaderboard={leaderboard_channel_id}, limit={leaderboard_limit}")
+                    logger.info(f"Channel config saved for {channel_id}: personality={personality_name}, quota={monthly_quota}, leaderboard={leaderboard_channel_id}, limit={leaderboard_limit}, timezone={timezone}")
                     return True
         except Exception as e:
             logger.error(f"Failed to save channel config: {e}")
@@ -401,6 +345,40 @@ class DatabaseManager:
         if config and config['leaderboard_channel_id']:
             return config['leaderboard_channel_id']
         return channel_id
+    
+    def get_channel_timezone(self, channel_id: str):
+        """Get the timezone for a channel, falling back to global default"""
+        config = self.get_channel_config(channel_id)
+        if config and config.get('timezone'):
+            return config['timezone']
+        
+        # Check for global timezone setting
+        global_tz = os.getenv('TIMEZONE', 'UTC')
+        return global_tz
+    
+    def get_timezone_offset(self, timezone_str: str):
+        """Convert timezone string (e.g., 'UTC+5', 'UTC-3') to hours offset"""
+        if timezone_str == 'UTC' or timezone_str == 'UTC+0':
+            return 0
+        
+        if timezone_str.startswith('UTC+'):
+            return int(timezone_str[4:])
+        elif timezone_str.startswith('UTC-'):
+            return -int(timezone_str[4:])
+        
+        # Default to UTC if format is invalid
+        return 0
+    
+    def get_current_month_year_in_timezone(self, channel_id: str):
+        """Get current month and year in the channel's timezone"""
+        tz_str = self.get_channel_timezone(channel_id)
+        offset_hours = self.get_timezone_offset(tz_str)
+        
+        # Get current UTC time and apply offset
+        utc_now = datetime.now(timezone.utc)
+        local_time = utc_now + timedelta(hours=offset_hours)
+        
+        return local_time.month, local_time.year
     
     def delete_channel_config(self, channel_id: str):
         """Delete channel configuration to reset to defaults"""

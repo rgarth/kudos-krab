@@ -1,4 +1,5 @@
 import logging
+import os
 from config.personalities import get_available_personalities, load_personality_for_channel, load_personality
 from config.settings import MONTHLY_QUOTA, DEFAULT_PERSONALITY, LEADERBOARD_LIMIT
 
@@ -29,10 +30,39 @@ def handle_config_command(ack, command, client, db_manager):
             "value": personality
         })
     
+    # Build timezone options for dropdown
+    timezone_options = []
+    for offset in range(-11, 12):  # UTC-11 to UTC+11
+        if offset == 0:
+            timezone_options.append({
+                "text": {
+                    "type": "plain_text",
+                    "text": "UTC (GMT+0)"
+                },
+                "value": "UTC"
+            })
+        elif offset > 0:
+            timezone_options.append({
+                "text": {
+                    "type": "plain_text",
+                    "text": f"UTC+{offset} (GMT+{offset})"
+                },
+                "value": f"UTC+{offset}"
+            })
+        else:
+            timezone_options.append({
+                "text": {
+                    "type": "plain_text",
+                    "text": f"UTC{offset} (GMT{offset})"
+                },
+                "value": f"UTC{offset}"
+            })
+    
     # Set current values
     current_personality = current_config['personality_name'] if current_config else DEFAULT_PERSONALITY
     current_quota = current_config['monthly_quota'] if current_config else MONTHLY_QUOTA
     current_limit = current_config['leaderboard_limit'] if current_config else LEADERBOARD_LIMIT
+    current_timezone = current_config['timezone'] if current_config else os.getenv('TIMEZONE', 'UTC')
     override_channel_id = current_config['leaderboard_channel_id'] if current_config else ""
     
     # Check if channel override is active
@@ -165,6 +195,37 @@ def handle_config_command(ack, command, client, db_manager):
             }
         })
     
+    # Add timezone block
+    if not has_override:
+        blocks.append({
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Timezone*"
+            },
+            "accessory": {
+                "type": "static_select",
+                "placeholder": {
+                    "type": "plain_text",
+                    "text": "Select timezone"
+                },
+                "options": timezone_options,
+                "action_id": "timezone_select",
+                "initial_option": next(
+                    (opt for opt in timezone_options if opt["value"] == current_timezone),
+                    timezone_options[11]  # Default to UTC if not found
+                )
+            }
+        })
+    else:
+        blocks.append({
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "*Timezone*\n_Disabled - inherited from source channel_"
+            }
+        })
+    
     # Add leaderboard block
     blocks.append({
         "type": "input",
@@ -250,6 +311,7 @@ def handle_config_modal_submission(ack, body, client, db_manager):
     personality = None
     quota = None
     leaderboard_limit = None
+    timezone = None
     leaderboard_channel = None
     
     # Get personality selection - need to find the block with the select
@@ -266,6 +328,8 @@ def handle_config_modal_submission(ack, body, client, db_manager):
                 leaderboard_limit = int(block_values['limit_input']['value'])
             except (ValueError, KeyError):
                 leaderboard_limit = None
+        elif 'timezone_select' in block_values:
+            timezone = block_values['timezone_select']['selected_option']['value']
         elif 'leaderboard_input' in block_values:
             leaderboard_value = block_values['leaderboard_input']['value']
             if leaderboard_value:
@@ -275,11 +339,12 @@ def handle_config_modal_submission(ack, body, client, db_manager):
             else:
                 leaderboard_channel = None
     
-    # If channel override is set, ignore personality, quota, and limit (they're inherited)
+    # If channel override is set, ignore personality, quota, limit, and timezone (they're inherited)
     if leaderboard_channel:
         personality = None
         quota = None
         leaderboard_limit = None
+        timezone = None
     
     # Save configuration
     success = db_manager.save_channel_config(
@@ -287,7 +352,8 @@ def handle_config_modal_submission(ack, body, client, db_manager):
         personality_name=personality,
         monthly_quota=quota,
         leaderboard_channel_id=leaderboard_channel,
-        leaderboard_limit=leaderboard_limit
+        leaderboard_limit=leaderboard_limit,
+        timezone=timezone
     )
     
     if success:
@@ -296,6 +362,7 @@ def handle_config_modal_submission(ack, body, client, db_manager):
         personality_name = personality or DEFAULT_PERSONALITY
         quota_text = f"{quota}" if quota else str(MONTHLY_QUOTA)
         limit_text = f"{leaderboard_limit}" if leaderboard_limit else str(LEADERBOARD_LIMIT)
+        timezone_text = timezone or os.getenv('TIMEZONE', 'UTC')
         leaderboard_text = f"<#{leaderboard_channel}>" if leaderboard_channel else "this channel"
         
         message = f"""✅ *Configuration saved for <#{channel_id}>*
@@ -303,6 +370,7 @@ def handle_config_modal_submission(ack, body, client, db_manager):
 • *Personality:* {personality_name.title()}
 • *Monthly Quota:* {quota_text}
 • *Leaderboard Limit:* {limit_text}
+• *Timezone:* {timezone_text}
 • *Leaderboard:* {leaderboard_text}
 
 Settings will take effect immediately! 🦀"""
@@ -332,6 +400,7 @@ def show_current_config(respond, channel_id, db_manager):
     personality_name = config['personality_name'] or DEFAULT_PERSONALITY
     quota = config['monthly_quota'] or MONTHLY_QUOTA
     limit = config['leaderboard_limit'] or LEADERBOARD_LIMIT
+    timezone = config['timezone'] or os.getenv('TIMEZONE', 'UTC')
     leaderboard_channel = config['leaderboard_channel_id'] or "this channel"
     
     if leaderboard_channel != "this channel":
@@ -341,10 +410,12 @@ def show_current_config(respond, channel_id, db_manager):
             inherited_personality = source_config['personality_name'] or DEFAULT_PERSONALITY
             inherited_quota = source_config['monthly_quota'] or MONTHLY_QUOTA
             inherited_limit = source_config['leaderboard_limit'] or LEADERBOARD_LIMIT
+            inherited_timezone = source_config['timezone'] or os.getenv('TIMEZONE', 'UTC')
         else:
             inherited_personality = DEFAULT_PERSONALITY
             inherited_quota = MONTHLY_QUOTA
             inherited_limit = LEADERBOARD_LIMIT
+            inherited_timezone = os.getenv('TIMEZONE', 'UTC')
         
         message = f"""📋 *Current Configuration for <#{channel_id}>*
 
@@ -353,6 +424,7 @@ def show_current_config(respond, channel_id, db_manager):
 • *Personality:* {inherited_personality.title()} (inherited from <#{leaderboard_channel}>)
 • *Monthly Quota:* {inherited_quota} (inherited from <#{leaderboard_channel}>)
 • *Leaderboard Limit:* {inherited_limit} (inherited from <#{leaderboard_channel}>)
+• *Timezone:* {inherited_timezone} (inherited from <#{leaderboard_channel}>)
 
 Use `/kk config edit` to modify these settings."""
     else:
@@ -362,6 +434,7 @@ Use `/kk config edit` to modify these settings."""
 • *Personality:* {personality_name.title()}
 • *Monthly Quota:* {quota}
 • *Leaderboard Limit:* {limit}
+• *Timezone:* {timezone}
 • *Leaderboard:* {leaderboard_channel}
 
 Use `/kk config edit` to modify these settings."""
