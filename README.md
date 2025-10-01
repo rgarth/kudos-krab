@@ -43,6 +43,8 @@ CREATE TABLE channel_configs (
     personality_name VARCHAR(255),
     monthly_quota INTEGER,
     leaderboard_channel_id VARCHAR(255),
+    leaderboard_limit INTEGER,
+    timezone VARCHAR(10),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
