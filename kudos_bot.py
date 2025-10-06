@@ -12,7 +12,12 @@ from handlers.config_handler import handle_config_command, handle_config_modal_s
 from handlers.status_handler import handle_status_command
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
+numeric_level = getattr(logging, log_level, logging.INFO)
+logging.basicConfig(
+    level=numeric_level,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 # Initialize Slack app
@@ -28,9 +33,14 @@ db_manager = get_db_manager()
 @app.middleware
 def log_request(logger, body, next):
     """Log incoming requests for debugging"""
-    logger.info(f"🦀 Incoming request: {body.get('type', 'unknown')}")
-    if body.get('type') == 'url_verification':
-        logger.info(f"🌊 Slack URL verification challenge received: {body.get('challenge', 'no challenge')}")
+    request_type = body.get('type', 'unknown')
+    
+    # Log health checks at DEBUG level to reduce noise
+    if request_type == 'url_verification':
+        logger.debug(f"🌊 Slack URL verification challenge received: {body.get('challenge', 'no challenge')}")
+    else:
+        logger.info(f"🦀 Incoming request: {request_type}")
+    
     return next()
 
 
@@ -75,7 +85,7 @@ def handle_kudos_command_wrapper(ack, command, say, respond):
                 show_current_config(respond, channel_id, db_manager)
             return
         elif first_word == "status":
-            handle_status_command(ack, respond, channel_id, db_manager, app.client)
+            handle_arget_command(ack, respond, channel_id, db_manager, app.client)
             return
         elif first_word == "version":
             from version import VERSION
