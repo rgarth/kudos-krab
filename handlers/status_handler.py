@@ -4,9 +4,14 @@ Shows bot health, installed channels, and operational statistics.
 """
 
 import logging
+import time
+import os
 from datetime import datetime
 from config.personalities import load_personality_for_channel
 from version import VERSION
+
+# Track bot startup time for uptime calculation
+BOT_START_TIME = time.time()
 
 logger = logging.getLogger(__name__)
 
@@ -109,10 +114,42 @@ def format_status_message(status_info, personality, db_manager):
     config_channels = status_info['config_channels']
     timestamp = status_info['timestamp']
     
+    # Calculate bot process uptime
+    bot_uptime_seconds = int(time.time() - BOT_START_TIME)
+    bot_uptime_days = bot_uptime_seconds // 86400
+    bot_uptime_hours = (bot_uptime_seconds % 86400) // 3600
+    bot_uptime_minutes = (bot_uptime_seconds % 3600) // 60
+    
+    if bot_uptime_days > 0:
+        bot_uptime_str = f"{bot_uptime_days}d {bot_uptime_hours}h {bot_uptime_minutes}m"
+    elif bot_uptime_hours > 0:
+        bot_uptime_str = f"{bot_uptime_hours}h {bot_uptime_minutes}m"
+    else:
+        bot_uptime_str = f"{bot_uptime_minutes}m"
+    
+    # Try to get system uptime
+    try:
+        with open('/proc/uptime', 'r') as f:
+            system_uptime_seconds = float(f.read().split()[0])
+            system_uptime_days = int(system_uptime_seconds // 86400)
+            system_uptime_hours = int((system_uptime_seconds % 86400) // 3600)
+            system_uptime_minutes = int((system_uptime_seconds % 3600) // 60)
+            
+            if system_uptime_days > 0:
+                system_uptime_str = f"{system_uptime_days}d {system_uptime_hours}h {system_uptime_minutes}m"
+            elif system_uptime_hours > 0:
+                system_uptime_str = f"{system_uptime_hours}h {system_uptime_minutes}m"
+            else:
+                system_uptime_str = f"{system_uptime_minutes}m"
+    except (FileNotFoundError, PermissionError, IndexError):
+        system_uptime_str = "Unknown"
+    
     # Bot status
     message = f"🤖 *Kudos Krab Bot Status*\n"
     message += f"🟢 *Status:* Online\n"
     message += f"📦 *Version:* {VERSION}\n"
+    message += f"⏱️ *Bot Uptime:* {bot_uptime_str}\n"
+    message += f"🖥️ *System Uptime:* {system_uptime_str}\n"
     message += f"⏰ *Checked:* {timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')}\n"
     message += f"🏢 *Workspace:* {bot_info.get('team', 'Unknown')}\n"
     message += f"🔗 *URL:* {bot_info.get('url', 'Unknown')}\n"
