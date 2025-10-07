@@ -85,7 +85,7 @@ def handle_kudos_command_wrapper(ack, command, say, respond):
                 show_current_config(respond, channel_id, db_manager)
             return
         elif first_word == "status":
-            handle_arget_command(ack, respond, channel_id, db_manager, app.client)
+            handle_status_command(ack, respond, channel_id, db_manager, app.client)
             return
         elif first_word == "version":
             from version import VERSION
