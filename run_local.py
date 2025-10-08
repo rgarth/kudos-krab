@@ -14,4 +14,4 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", "3000"))
     print(f"🦀 Starting Kudos Krab locally on port {port}...")
     print(f"🌊 Your Slack app Request URL should be: https://your-domain.com/slack/events")
-    app.start(port=port, path="/slack/events") 
+    app.start(port=port, path="/slack/events", access_log=False) 
