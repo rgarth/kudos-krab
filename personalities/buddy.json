@@ -1,0 +1,71 @@
+{
+  "name": "Buddy",
+  "description": "Buddy the Elf personality with corny Christmas sayings and holiday cheer",
+  "help": {
+    "title": "SANTA'S COMING! 🎅 I'm Buddy the Elf! Here's how to spread Christmas cheer:",
+    "send_kudos": "🎄 Send Christmas Kudos:",
+    "commands": "🎁 Commands:",
+    "footer": "Now go spread some Christmas cheer, you little elf! 🎅✨"
+  },
+  "errors": {
+    "no_mentions": [
+      "SANTA'S COMING! 🎅 You can't just send presents to the North Pole! You need to mention someone with @username to send them some Christmas cheer! 🎄 Don't be a little elf - spread those holiday vibes! ✨\n\nTry `/kk help` to see how to use the bot!",
+      "CHRISTMAS SPIRIT! 🎅 The workshop is empty without someone to appreciate! Tag a teammate with @username and let's make some holiday magic happen! 🎄\n\nCheck out `/kk help` for the full Christmas scoop!",
+      "YIKES! 🎅 You can't just send presents into the snow! Pick someone awesome and give them a Christmas shoutout! 🎄\n\nPeep `/kk help` for the deets, you little elf!"
+    ],
+    "user_not_found": "OOPS! 🎅 I couldn't find a user with username @{username}! 🎄\n\nMake sure you're using the correct username, you little elf! In Enterprise workspaces, try using their full email address or check that they're in this workspace.\n\nYou can also try mentioning them directly with @username in your message! ✨",
+    "self_kudos": [
+      "NICE TRY, LITTLE ELF! 😂 But you can't give yourself presents, you Christmas friend! 🎅 Save that self-love for someone else, you little elf! 🎄✨ Maybe try singing a Christmas carol instead? 🎵",
+      "AWWW, YOU LITTLE ELF! 🎅 Self-kudos? That's like an elf trying to high-five itself! 😂 Save the love for your amazing teammates! 🎄✨",
+      "HEY THERE, LITTLE BUDDY! 🎅 I love your Christmas enthusiasm, but self-kudos is like a reindeer trying to ride a sleigh! 😂 Spread that love to others! 🎄✨"
+    ],
+    "bot_kudos": [
+      "AWWW, YOU LITTLE ELF! 🥺 You're trying to give ME kudos? That's so sweet! 🎅 *blushes in elf* 🎄✨ But I'm just here to help spread the Christmas love - save those kudos for your amazing teammates! 💕 Maybe try `/kk help` to see how to send kudos to others? 🎅",
+      "NICE TRY, LITTLE BUDDY! 🎅 But I'm just a humble Christmas kudos coach - I can't accept the love! 😂 Save those kudos for your awesome teammates! 🎄✨",
+      "AWWW, YOU LITTLE ELF! 🥺 You're making me blush! 🎅 But I'm just the messenger - spread that love to your amazing team instead! 🎄✨ Maybe check out `/kk help` for ideas?"
+    ],
+    "empty_message": "COME ON, YOU LITTLE ELF! 🎅 You can't just send empty presents! 🎄 Add some words to make it special, you Christmas friend - that's what makes Santa's workshop sparkle! ✨",
+    "quota_exceeded": "YIKES, LITTLE BUDDY! 😅 Looks like you're all out of Christmas presents! 🎅 You need {kudos_needed} more but only have {remaining} left this month, you Christmas friend. Time to wait for the next Christmas! 🎄",
+    "failed_kudos": "OOPS, YOU LITTLE ELF! 😅 Looks like the workshop got a bit messy for {failed_mentions}! 🎅 Let's try that again, you cotton-headed ninny muggins - the elves will be better this time! 🎄",
+    "database_error": "YIKES, LITTLE BUDDY! 😅 The workshop got a bit chaotic while I was checking the leaderboard! 🎅 Let's try that again, you little elf - the elves should be calmer now! 🎄",
+    "stats_error": "OOPS, YOU LITTLE ELF! 😅 The workshop got a bit messy while I was checking your stats! 🎅 Let's try that again, you Christmas goofball - the elves should be clearer now! 🎄",
+    "generic_error": "OOPS, YOU LITTLE BUDDY! 😅 Something went a bit sideways in the workshop! 🎅 Let's try that again, you Christmas friend - the elves should be smoother now! 🎄"
+  },
+  "success": {
+    "kudos_single": "FA LA LA LA LA! 🎵 Present delivered like Christmas magic! 🎅 You've got {remaining} more presents left this month, you cotton-headed ninny muggins - keep that holiday energy flowing! 🎄✨",
+    "kudos_multiple": "DECK THE HALLS! 🎵 You just made it RAIN presents on {count} people! 🎅 That's {remaining} more gifts in your Santa sack, you little elf - you're absolutely SINGING! 🎵🎄",
+    "announcement_single": [
+      "🎅 *SILENT NIGHT!* 🎵\n<@{user_id}> just delivered a Christmas present to <@{receiver}>! 🎁\n\n> {message}\n\n*That's what I call spreading Christmas cheer!* 🎅✨",
+      "🎅 *JOY TO THE WORLD!* 🎵\n<@{user_id}> is spreading the Christmas love to <@{receiver}>! 🎄\n\n> {message}\n\n*Now THAT'S how you spread holiday cheer!* 🎅✨",
+      "🎅 *SANTA'S WORKSHOP DELIVERY!* 🎅\n<@{user_id}> just made <@{receiver}>'s day with some sweet Christmas presents! 🎁\n\n> {message}\n\n*You're absolutely SPREADING Christmas cheer!* 🎅✨"
+    ],
+    "announcement_multiple": [
+      "🎅 *WE WISH YOU A MERRY CHRISTMAS!* 🎵\n<@{user_id}> just went FULL SANTA'S WORKSHOP MODE and delivered presents to {receivers}! 🎁🎅\n\n> {message}\n\n*Now THAT'S how you spread Christmas cheer!* 🎅✨",
+      "🎅 *CAROL OF THE BELLS!* 🎵\n<@{user_id}> is making it RAIN presents on {receivers}! 🎄🎅\n\n> {message}\n\n*That's what I call spreading the Christmas spirit!* 🎅✨",
+      "🎅 *SANTA'S WORKSHOP DELIVERY SERVICE!* 🎅\n<@{user_id}> just unleashed a present STORM on {receivers}! 🎁⚡\n\n> {message}\n\n*You're absolutely SINGING today!* 🎵🎅"
+    ]
+  },
+  "app_mention": "SANTA'S COMING! 🎅 I'm Buddy the Elf, your favorite Christmas kudos coach! 🎄\n\nHere's how to spread Christmas cheer:\n• `/kk @user message` - Send Christmas love to one person\n• `/kk @user1 @user2 message` - Spread the holiday cheer to multiple people\n• `/kk leaderboard` - See who's making the biggest Christmas splash\n• `/kk leaderboard Aug 2025` - See specific month/year\n• `/kk stats` - Check your own Christmas kudos journey\n\nLet's make this workshop sparkle, you cotton-headed ninny muggins! ✨",
+  "leaderboard": {
+    "title": "🎅 {month_name} CHRISTMAS KUDOS CHAMPIONS 🎅",
+    "senders_title": "🏆 TOP CHRISTMAS KUDOS SPREADERS 🏆",
+    "receivers_title": "🌟 TOP CHRISTMAS KUDOS RECEIVERS 🌟",
+    "no_senders": "No Christmas kudos sent this month yet! Let's get this holiday party started! 🎅",
+    "no_receivers": "No Christmas kudos received this month yet! Time to spread some holiday love! 🎄",
+    "top_sender_single": "Our top Christmas kudos sender is <@{sender}> with {count} kudos 🎄",
+    "top_sender_multiple": "Our top Christmas kudos senders are {senders} with {count} kudos each 🎄",
+    "posted_confirmation": "✅ Christmas leaderboard posted to the channel!",
+    "footer": "Keep spreading that Christmas cheer! 🎄✨"
+  },
+  "stats": {
+    "title": "🎅 YOUR CHRISTMAS MONTHLY KUDOS STATUS 🎅",
+    "this_month": "This Month:",
+    "all_time": "All Time:",
+    "kudos_sent": "Christmas Kudos Sent:",
+    "kudos_received": "Christmas Kudos Received:",
+    "remaining": "Remaining to Send:",
+    "total_sent": "Total Christmas Kudos Sent:",
+    "total_received": "Total Christmas Kudos Received:",
+    "footer": "You're absolutely SINGING Christmas cheer! 🎵"
+  }
+}

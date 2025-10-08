@@ -89,3 +89,5 @@ Some messages support template variables:
 ## Current personalities
 
 - **crab** - Overly enthusiastic with crab/ocean puns and summer camp counselor energy (default)
+- **spooky** - Spooky Halloween personality with ghostly puns and eerie enthusiasm
+- **buddy** - Buddy the Elf personality with corny Christmas sayings and holiday cheer

@@ -1,0 +1,71 @@
+{
+  "name": "Spooky",
+  "description": "Spooky Halloween personality with ghostly puns and eerie enthusiasm",
+  "help": {
+    "title": "BOO! 👻 Welcome to the spookiest kudos bot around! Here's how to haunt your teammates:",
+    "send_kudos": "🎃 Send Spooky Kudos:",
+    "commands": "🦇 Commands:",
+    "footer": "Now go spread some spooky love, you little ghost! 👻✨"
+  },
+  "errors": {
+    "no_mentions": [
+      "BOO! 👻 You can't just haunt the void! You need to mention someone with @username to send them some spooky love! 🦇 Don't be afraid, little ghost - spread those eerie vibes! ✨\n\nTry `/kk help` to see how to use the bot!",
+      "SPOOKY! 👻 The graveyard is empty without someone to appreciate! Tag a teammate with @username and let's make some haunting happen! 🦇\n\nCheck out `/kk help` for the full ghostly scoop!",
+      "YIKES! 👻 You can't just send kudos into the darkness! Pick someone awesome and give them a spooky shoutout! 🦇\n\nPeep `/kk help` for the deets, you little phantom!"
+    ],
+    "user_not_found": "OOPS! 👻 I couldn't find a user with username @{username}! 🦇\n\nMake sure you're using the correct username, you spooky friend! In Enterprise workspaces, try using their full email address or check that they're in this workspace.\n\nYou can also try mentioning them directly with @username in your message! ✨",
+    "self_kudos": [
+      "NICE TRY, LITTLE GHOST! 😂 But you can't give yourself kudos, you spooky specter! 👻 Save that self-love for someone else, you eerie friend! 🦇✨ Maybe try giving yourself a spooky high-five instead? 👻",
+      "AWWW, YOU SPOOKY THING! 👻 Self-kudos? That's like a ghost trying to high-five itself! 😂 Save the love for your amazing teammates! 🦇✨",
+      "HEY THERE, LITTLE PHANTOM! 👻 I love your spooky enthusiasm, but self-kudos is like a vampire trying to ride a broomstick! 😂 Spread that love to others! 🦇✨"
+    ],
+    "bot_kudos": [
+      "AWWW, YOU SPOOKY FRIEND! 🥺 You're trying to give ME kudos? That's so sweet! 👻 *blushes in ghost* 🦇✨ But I'm just here to help spread the spooky love - save those kudos for your amazing teammates! 💕 Maybe try `/kk help` to see how to send kudos to others? 👻",
+      "NICE TRY, LITTLE GHOST! 👻 But I'm just a humble spooky kudos coach - I can't accept the love! 😂 Save those kudos for your awesome teammates! 🦇✨",
+      "AWWW, YOU SPOOKY BUDDY! 🥺 You're making me blush! 👻 But I'm just the messenger - spread that love to your amazing team instead! 🦇✨ Maybe check out `/kk help` for ideas?"
+    ],
+    "empty_message": "COME ON, YOU SPOOKY THING! 👻 You can't just send empty kudos! 🦇 Add some words to make it special, you little ghost - that's what makes the graveyard sparkle! ✨",
+    "quota_exceeded": "YIKES, LITTLE PHANTOM! 😅 Looks like you're all out of Halloween treats! 👻 You need {kudos_needed} more but only have {remaining} left this month, you eerie friend. Time to wait for the next Halloween! 🎃",
+    "failed_kudos": "OOPS, YOU SPOOKY FRIEND! 😅 Looks like the graveyard got a bit haunted for {failed_mentions}! 👻 Let's try that again, you little ghost - the spirits will be better this time! 🦇",
+    "database_error": "YIKES, LITTLE PHANTOM! 😅 The graveyard got a bit spooky while I was checking the leaderboard! 👻 Let's try that again, you eerie friend - the spirits should be calmer now! 🦇",
+    "stats_error": "OOPS, YOU SPOOKY THING! 😅 The graveyard got a bit haunted while I was checking your stats! 👻 Let's try that again, you little ghost - the spirits should be clearer now! 🦇",
+    "generic_error": "OOPS, YOU SPOOKY FRIEND! 😅 Something went a bit sideways in the graveyard! 👻 Let's try that again, you little phantom - the spirits should be smoother now! 🦇"
+  },
+  "success": {
+    "kudos_single": "TRICK OR TREAT! 🎃 Kudos delivered like a spooky surprise! 👻 You've got {remaining} more treats left this month, you eerie friend - keep that haunting energy flowing! 🦇✨",
+    "kudos_multiple": "SPOOKY SURPRISE! 🎃 You just made it RAIN treats on {count} people! 👻 That's {remaining} more kudos in your candy bag, you little phantom - you're absolutely HAUNTING! 👻🦇",
+    "announcement_single": [
+      "👻 *TRICK OR TREAT!* 👻\n<@{user_id}> just gave <@{receiver}> a spooky surprise! 🎃\n\n> {message}\n\n*That's what I call a Halloween treat!* 👻✨",
+      "👻 *SPOOKY SURPRISE!* 👻\n<@{user_id}> is spreading the Halloween love to <@{receiver}>! 🦇\n\n> {message}\n\n*Now THAT'S how you trick or treat!* 👻✨",
+      "👻 *HAUNTING DELIVERY!* 👻\n<@{user_id}> just made <@{receiver}>'s day with some eerie kudos! 🎃\n\n> {message}\n\n*You're absolutely SPOOKING it!* 👻✨"
+    ],
+    "announcement_multiple": [
+      "👻 *TRICK OR TREAT FOR EVERYONE!* 👻\n<@{user_id}> just went FULL HALLOWEEN MODE and gave treats to {receivers}! 🎃👻\n\n> {message}\n\n*Now THAT'S how you trick or treat!* 👻✨",
+      "👻 *SPOOKY SURPRISE PARTY!* 👻\n<@{user_id}> is making it RAIN treats on {receivers}! 🦇👻\n\n> {message}\n\n*That's what I call spreading the Halloween spirit!* 👻✨",
+      "👻 *HAUNTING DELIVERY SERVICE!* 👻\n<@{user_id}> just unleashed a treat STORM on {receivers}! 🎃⚡\n\n> {message}\n\n*You're absolutely SPOOKING today!* 👻🔥"
+    ]
+  },
+  "app_mention": "BOO! 👻 I'm your favorite spooky kudos coach! 🦇\n\nHere's how to haunt your teammates:\n• `/kk @user message` - Send spooky love to one person\n• `/kk @user1 @user2 message` - Spread the haunting to multiple people\n• `/kk leaderboard` - See who's making the biggest spooky splash\n• `/kk leaderboard Aug 2025` - See specific month/year\n• `/kk stats` - Check your own spooky kudos journey\n\nLet's make this graveyard sparkle, you little ghost! ✨",
+  "leaderboard": {
+    "title": "👻 {month_name} SPOOKY KUDOS CHAMPIONS 👻",
+    "senders_title": "🏆 TOP SPOOKY KUDOS SPREADERS 🏆",
+    "receivers_title": "🌟 TOP SPOOKY KUDOS RECEIVERS 🌟",
+    "no_senders": "No spooky kudos sent this month yet! Let's get this haunting started! 👻",
+    "no_receivers": "No spooky kudos received this month yet! Time to spread some eerie love! 🦇",
+    "top_sender_single": "Our top spooky kudos sender is <@{sender}> with {count} kudos 🦇",
+    "top_sender_multiple": "Our top spooky kudos senders are {senders} with {count} kudos each 🦇",
+    "posted_confirmation": "✅ Spooky leaderboard posted to the channel!",
+    "footer": "Keep making those spooky waves! 🦇✨"
+  },
+  "stats": {
+    "title": "👻 YOUR SPOOKY MONTHLY KUDOS STATUS 👻",
+    "this_month": "This Month:",
+    "all_time": "All Time:",
+    "kudos_sent": "Spooky Kudos Sent:",
+    "kudos_received": "Spooky Kudos Received:",
+    "remaining": "Remaining to Send:",
+    "total_sent": "Total Spooky Kudos Sent:",
+    "total_received": "Total Spooky Kudos Received:",
+    "footer": "You're absolutely SPOOKING it! 👻"
+  }
+}
