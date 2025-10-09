@@ -3,6 +3,32 @@ from config.personalities import load_personality, load_personality_for_channel
 import random
 
 
+def get_shared_leaderboard_channels(channel_id, db_manager):
+    """Get all channels that share the same leaderboard as the given channel"""
+    if not db_manager:
+        return [channel_id]
+    
+    # Get the effective leaderboard channel for the given channel
+    effective_channel = db_manager.get_effective_leaderboard_channel(channel_id)
+    
+    # Find all channels that use this same effective leaderboard channel
+    shared_channels = [effective_channel]  # Start with the source channel
+    
+    # Get all channel configs to find channels that inherit from this one
+    try:
+        with db_manager.get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT channel_id FROM channel_configs WHERE leaderboard_channel_id = %s", (effective_channel,))
+                inherited_channels = [row[0] for row in cursor.fetchall()]
+                shared_channels.extend(inherited_channels)
+    except Exception as e:
+        # If there's an error, just return the original channel
+        return [channel_id]
+    
+    # Remove duplicates and return
+    return list(set(shared_channels))
+
+
 def format_leaderboard(leaderboard_data, month, year, channel_id=None, db_manager=None):
     """Format leaderboard data for Slack message"""
     if channel_id and db_manager:
@@ -10,6 +36,19 @@ def format_leaderboard(leaderboard_data, month, year, channel_id=None, db_manage
     else:
         personality = load_personality()
     month_name = datetime(year, month, 1).strftime("%B %Y")
+    
+    # Get channels that share this leaderboard
+    shared_channels = get_shared_leaderboard_channels(channel_id, db_manager)
+    
+    # Format channel information for the title
+    if len(shared_channels) == 1:
+        channel_info = f"for <#{shared_channels[0]}>"
+    elif len(shared_channels) == 2:
+        channel_info = f"for <#{shared_channels[0]}> and <#{shared_channels[1]}>"
+    else:
+        # For 3+ channels: "channel1, channel2 and channel3"
+        channel_mentions = ", ".join([f"<#{ch}>" for ch in shared_channels[:-1]])
+        channel_info = f"for {channel_mentions} and <#{shared_channels[-1]}>"
     
     # Format top receivers (most important - show first)
     receivers_text = f"*{personality['leaderboard']['receivers_title']}*\n"
@@ -41,7 +80,7 @@ def format_leaderboard(leaderboard_data, month, year, channel_id=None, db_manage
     title = personality['leaderboard']['title'].format(month_name=month_name)
     footer = personality['leaderboard']['footer']
     
-    return f"*{title}*\n\n{receivers_text}{senders_text}\n\n*{footer}*"
+    return f"*{title} {channel_info}*\n\n{receivers_text}{senders_text}\n\n*{footer}*"
 
 
 def format_kudos_announcement(user_id, successful_kudos, message, channel_id=None, db_manager=None):
