@@ -32,40 +32,43 @@
     "generic_error": "Oh, how typical. Something went wrong in the universe. 🤖 How utterly predictable. Let's try that again, though I'm sure it won't work. The universe should be smoother now, though I doubt it."
   },
   "success": {
-    "kudos_single": "Oh, how wonderful. Kudos delivered like a depressing surprise. 🤖 You've got {remaining} more kudos left this month, though I'm sure you'll waste them. How terribly predictable.",
-    "kudos_multiple": "Oh, how typical. You just made it RAIN kudos on {count} people. 🤖 That's {remaining} more kudos in your depressing tank. How utterly predictable.",
+    "kudos_single": [
+      "I have a brain the size of a planet, and I am delivering your kudos. 🤖 You've got {remaining} more kudos left this month. How terribly depressing.",
+      "Oh, how wonderful. Kudos delivered like a depressing surprise. 🤖 You've got {remaining} more kudos left this month, though I'm sure you'll waste them. How terribly predictable."
+    ],
+    "kudos_multiple": "Oh, how typical. You just made it RAIN kudos on {count} people. 🤖 That's {remaining} more kudos in your tank. How utterly predictable.",
     "announcement_single": [
-      "🤖 *Oh, how wonderful.* 🤖\n<@{user_id}> just delivered some depressing kudos to <@{receiver}>! 🤖\n\n> {message}\n\n*How terribly predictable.* 🤖",
-      "🤖 *Oh, how typical.* 🤖\n<@{user_id}> is spreading the misery to <@{receiver}>! 🤖\n\n> {message}\n\n*How utterly depressing.* 🤖",
+      "🤖 *Oh, how wonderful.* 🤖\n<@{user_id}> just delivered some kudos to <@{receiver}>! 🤖\n\n> {message}\n\n*How terribly predictable.* 🤖",
+      "🤖 *Oh, how typical.* 🤖\n<@{user_id}> is spreading the joy to <@{receiver}>! 🤖\n\n> {message}\n\n*How utterly depressing.* 🤖",
       "🤖 *Oh, how predictable.* 🤖\n<@{user_id}> just made <@{receiver}>'s day with some kudos! 🤖\n\n> {message}\n\n*How terribly depressing.* 🤖"
     ],
     "announcement_multiple": [
-      "🤖 *Oh, how wonderful.* 🤖\n<@{user_id}> just went FULL DEPRESSING MODE and sent kudos to {receivers}! 🤖\n\n> {message}\n\n*How terribly predictable.* 🤖",
-      "🤖 *Oh, how typical.* 🤖\n<@{user_id}> is making it RAIN misery on {receivers}! 🤖\n\n> {message}\n\n*How utterly depressing.* 🤖",
+      "🤖 *Oh, how wonderful.* 🤖\n<@{user_id}> just went FULL ROBOT MODE and sent kudos to {receivers}! 🤖\n\n> {message}\n\n*How terribly predictable.* 🤖",
+      "🤖 *Oh, how typical.* 🤖\n<@{user_id}> is making it RAIN kudos on {receivers}! 🤖\n\n> {message}\n\n*How utterly depressing.* 🤖",
       "🤖 *Oh, how predictable.* 🤖\n<@{user_id}> just unleashed a kudos STORM on {receivers}! 🤖\n\n> {message}\n\n*How terribly depressing.* 🤖"
     ]
   },
-  "app_mention": "Oh, great. You mentioned me. How utterly predictable. 🤖 I'm Marvin, your depressed kudos coach. Life, don't talk to me about life.\n\nHere's how to spread misery... I mean, kudos:\n• `/kk @user message` - Send depressing love to one person\n• `/kk @user1 @user2 message` - Spread the misery to multiple people\n• `/kk leaderboard` - See who's making the biggest depressing splash\n• `/kk leaderboard Aug 2025` - See specific month/year\n• `/kk stats` - Check your own depressing kudos journey\n\nLet's make this universe slightly less meaningless, I suppose. 🤖",
+  "app_mention": "Oh, great. You mentioned me. How utterly predictable. 🤖 I'm Marvin, your depressed kudos coach. I have a brain the size of a planet, and I am delivering your kudos. Life, don't talk to me about life.\n\nHere's how to spread misery... I mean, kudos:\n• `/kk @user message` - Send kudos to one person\n• `/kk @user1 @user2 message` - Spread the joy to multiple people\n• `/kk leaderboard` - See who's making the biggest splash\n• `/kk leaderboard Aug 2025` - See specific month/year\n• `/kk stats` - Check your own kudos journey\n\nLet's make this universe slightly less meaningless, I suppose. 🤖",
   "leaderboard": {
-    "title": "🤖 {month_name} DEPRESSING KUDOS CHAMPIONS 🤖",
-    "senders_title": "🏆 TOP DEPRESSING KUDOS SPREADERS 🏆",
-    "receivers_title": "🌟 TOP DEPRESSING KUDOS RECEIVERS 🌟",
+    "title": "🤖 {month_name} KUDOS CHAMPIONS 🤖",
+    "senders_title": "🏆 TOP KUDOS SPREADERS 🏆",
+    "receivers_title": "🌟 TOP KUDOS RECEIVERS 🌟",
     "no_senders": "No kudos sent this month yet! How utterly predictable. 🤖",
     "no_receivers": "No kudos received this month yet! How terribly depressing. 🤖",
-    "top_sender_single": "Our top depressing kudos sender is <@{sender}> with {count} kudos 🤖",
-    "top_sender_multiple": "Our top depressing kudos senders are {senders} with {count} kudos each 🤖",
-    "posted_confirmation": "✅ Depressing leaderboard posted to the channel!",
+    "top_sender_single": "Our top kudos sender is <@{sender}> with {count} kudos 🤖",
+    "top_sender_multiple": "Our top kudos senders are {senders} with {count} kudos each 🤖",
+    "posted_confirmation": "✅ Leaderboard posted to the channel!",
     "footer": "Keep making this universe slightly less meaningless! 🤖"
   },
   "stats": {
-    "title": "🤖 YOUR DEPRESSING MONTHLY KUDOS STATUS 🤖",
+    "title": "🤖 YOUR MONTHLY KUDOS STATUS 🤖",
     "this_month": "This Month:",
     "all_time": "All Time:",
-    "kudos_sent": "Depressing Kudos Sent:",
-    "kudos_received": "Depressing Kudos Received:",
+    "kudos_sent": "Kudos Sent:",
+    "kudos_received": "Kudos Received:",
     "remaining": "Remaining to Send:",
-    "total_sent": "Total Depressing Kudos Sent:",
-    "total_received": "Total Depressing Kudos Received:",
+    "total_sent": "Total Kudos Sent:",
+    "total_received": "Total Kudos Received:",
     "footer": "You're absolutely making this universe slightly less depressing! 🤖"
   }
 }

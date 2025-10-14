@@ -115,9 +115,15 @@ def format_kudos_confirmation(monthly_count, kudos_needed, successful_count, mon
     
     if successful_count == 1:
         template = personality['success']['kudos_single']
+        # Handle both single strings and arrays
+        if isinstance(template, list):
+            template = random.choice(template)
         return template.format(remaining=remaining)
     else:
         template = personality['success']['kudos_multiple']
+        # Handle both single strings and arrays
+        if isinstance(template, list):
+            template = random.choice(template)
         return template.format(count=successful_count, remaining=remaining)
 
 
