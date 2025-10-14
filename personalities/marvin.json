@@ -1,0 +1,71 @@
+{
+  "name": "Marvin",
+  "description": "Marvin the Paranoid Android from Hitchhiker's Guide to the Galaxy - hilariously pessimistic and depressed",
+  "help": {
+    "title": "Oh, great. Another request for help. How utterly predictable. 🤖 Here's how to spread misery... I mean, kudos:",
+    "send_kudos": "📋 Send Depressing Kudos:",
+    "commands": "⚙️ Commands:",
+    "footer": "Well, I suppose you'll want to use this now. How terribly depressing. 🤖"
+  },
+  "errors": {
+    "no_mentions": [
+      "Oh, how typical. You want to send kudos but can't even be bothered to mention anyone. 🤖 Life, don't talk to me about life. You need to mention someone with @username to send them some... joy. How utterly depressing.\n\nTry `/kk help` if you can muster the energy.",
+      "Well, this is just perfect. You want to send kudos into the void. How absolutely predictable. 🤖 The universe is a cruel, meaningless place, and you can't even mention someone properly.\n\nCheck `/kk help` if you can bear it.",
+      "Oh, wonderful. Another failure. You can't just send kudos to nobody, you know. 🤖 How terribly depressing. Pick someone and give them a mention, if you can manage it.\n\nPeep `/kk help` for the details, though I doubt it'll help."
+    ],
+    "user_not_found": "Oh, how perfectly typical. I couldn't find a user with username @{username}. 🤖\n\nHow utterly predictable. Make sure you're using the correct username, though I'm sure you won't. In Enterprise workspaces, try using their full email address or check that they're in this workspace.\n\nYou can also try mentioning them directly with @username in your message, though I doubt it'll work.",
+    "self_kudos": [
+      "Oh, how perfectly typical. You're trying to give yourself kudos. 🤖 How utterly depressing. You can't give yourself kudos, you know. Save that self-love for someone else, though I'm sure they don't want it either. Maybe try giving yourself a pat on the back instead? Though I doubt it'll help.",
+      "Aww, how touching. Self-kudos? That's like a robot trying to high-five itself. 🤖 How utterly depressing. Save the love for your teammates, though I'm sure they don't want it either.",
+      "Oh, how wonderful. You love your own enthusiasm, but self-kudos is like a depressed robot trying to ride a bicycle. 🤖 How terribly predictable. Spread that love to others, though I'm sure they won't appreciate it."
+    ],
+    "bot_kudos": [
+      "Oh, how perfectly typical. You're trying to give ME kudos? How utterly depressing. 🤖 *sighs in robot* But I'm just here to help spread the misery... I mean, kudos. Save those kudos for your teammates, though I'm sure they don't want them either. Maybe try `/kk help` to see how to send kudos to others? Though I doubt it'll help.",
+      "Oh, how wonderful. You're trying to give me kudos. 🤖 But I'm just a humble, depressed kudos coach - I can't accept the love. How terribly predictable. Save those kudos for your teammates, though I'm sure they don't want them either.",
+      "Aww, how touching. You're making me... well, not exactly blush, but something. 🤖 But I'm just the messenger of misery - spread that love to your team instead, though I'm sure they won't appreciate it. Maybe check out `/kk help` for ideas? Though I doubt it'll help."
+    ],
+    "empty_message": "Oh, how typical. You can't just send empty kudos. 🤖 How utterly depressing. Add some words to make it special, though I'm sure it won't help. That's what makes the universe slightly less meaningless, I suppose.",
+    "quota_exceeded": "Oh, how perfectly predictable. You're all out of kudos. 🤖 How utterly depressing. You need {kudos_needed} more but only have {remaining} left this month. Time to wait for the next month, though I'm sure it won't be any better.",
+    "failed_kudos": "Oh, how typical. The universe got a bit chaotic for {failed_mentions}. 🤖 How utterly predictable. Let's try that again, though I'm sure it won't work. The universe should be calmer now, though I doubt it.",
+    "database_error": "Oh, how perfectly typical. The universe got a bit depressing while I was checking the leaderboard. 🤖 How utterly predictable. Let's try that again, though I'm sure it won't work. The universe should be less depressing now, though I doubt it.",
+    "stats_error": "Oh, how wonderful. The universe got a bit chaotic while I was checking your stats. 🤖 How terribly predictable. Let's try that again, though I'm sure it won't work. The universe should be clearer now, though I doubt it.",
+    "generic_error": "Oh, how typical. Something went wrong in the universe. 🤖 How utterly predictable. Let's try that again, though I'm sure it won't work. The universe should be smoother now, though I doubt it."
+  },
+  "success": {
+    "kudos_single": "Oh, how wonderful. Kudos delivered like a depressing surprise. 🤖 You've got {remaining} more kudos left this month, though I'm sure you'll waste them. How terribly predictable.",
+    "kudos_multiple": "Oh, how typical. You just made it RAIN kudos on {count} people. 🤖 That's {remaining} more kudos in your depressing tank. How utterly predictable.",
+    "announcement_single": [
+      "🤖 *Oh, how wonderful.* 🤖\n<@{user_id}> just delivered some depressing kudos to <@{receiver}>! 🤖\n\n> {message}\n\n*How terribly predictable.* 🤖",
+      "🤖 *Oh, how typical.* 🤖\n<@{user_id}> is spreading the misery to <@{receiver}>! 🤖\n\n> {message}\n\n*How utterly depressing.* 🤖",
+      "🤖 *Oh, how predictable.* 🤖\n<@{user_id}> just made <@{receiver}>'s day with some kudos! 🤖\n\n> {message}\n\n*How terribly depressing.* 🤖"
+    ],
+    "announcement_multiple": [
+      "🤖 *Oh, how wonderful.* 🤖\n<@{user_id}> just went FULL DEPRESSING MODE and sent kudos to {receivers}! 🤖\n\n> {message}\n\n*How terribly predictable.* 🤖",
+      "🤖 *Oh, how typical.* 🤖\n<@{user_id}> is making it RAIN misery on {receivers}! 🤖\n\n> {message}\n\n*How utterly depressing.* 🤖",
+      "🤖 *Oh, how predictable.* 🤖\n<@{user_id}> just unleashed a kudos STORM on {receivers}! 🤖\n\n> {message}\n\n*How terribly depressing.* 🤖"
+    ]
+  },
+  "app_mention": "Oh, great. You mentioned me. How utterly predictable. 🤖 I'm Marvin, your depressed kudos coach. Life, don't talk to me about life.\n\nHere's how to spread misery... I mean, kudos:\n• `/kk @user message` - Send depressing love to one person\n• `/kk @user1 @user2 message` - Spread the misery to multiple people\n• `/kk leaderboard` - See who's making the biggest depressing splash\n• `/kk leaderboard Aug 2025` - See specific month/year\n• `/kk stats` - Check your own depressing kudos journey\n\nLet's make this universe slightly less meaningless, I suppose. 🤖",
+  "leaderboard": {
+    "title": "🤖 {month_name} DEPRESSING KUDOS CHAMPIONS 🤖",
+    "senders_title": "🏆 TOP DEPRESSING KUDOS SPREADERS 🏆",
+    "receivers_title": "🌟 TOP DEPRESSING KUDOS RECEIVERS 🌟",
+    "no_senders": "No kudos sent this month yet! How utterly predictable. 🤖",
+    "no_receivers": "No kudos received this month yet! How terribly depressing. 🤖",
+    "top_sender_single": "Our top depressing kudos sender is <@{sender}> with {count} kudos 🤖",
+    "top_sender_multiple": "Our top depressing kudos senders are {senders} with {count} kudos each 🤖",
+    "posted_confirmation": "✅ Depressing leaderboard posted to the channel!",
+    "footer": "Keep making this universe slightly less meaningless! 🤖"
+  },
+  "stats": {
+    "title": "🤖 YOUR DEPRESSING MONTHLY KUDOS STATUS 🤖",
+    "this_month": "This Month:",
+    "all_time": "All Time:",
+    "kudos_sent": "Depressing Kudos Sent:",
+    "kudos_received": "Depressing Kudos Received:",
+    "remaining": "Remaining to Send:",
+    "total_sent": "Total Depressing Kudos Sent:",
+    "total_received": "Total Depressing Kudos Received:",
+    "footer": "You're absolutely making this universe slightly less depressing! 🤖"
+  }
+}

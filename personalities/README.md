@@ -91,3 +91,4 @@ Some messages support template variables:
 - **crab** - Overly enthusiastic with crab/ocean puns and summer camp counselor energy (default)
 - **spooky** - Spooky Halloween personality with ghostly puns and eerie enthusiasm
 - **buddy** - Buddy the Elf personality with corny Christmas sayings and holiday cheer
+- **marvin** - Marvin the Paranoid Android from Hitchhiker's Guide - hilariously pessimistic and depressed
