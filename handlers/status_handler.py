@@ -1,5 +1,5 @@
 """
-Status handler for the Kudos Krab bot.
+Status handler for the Kiitos Krab bot.
 Shows bot health, installed channels, and operational statistics.
 """
 
@@ -128,7 +128,7 @@ def format_status_message(status_info, personality, db_manager):
         uptime_str = f"{uptime_minutes}m"
     
     # Bot status
-    message = f"🤖 *Kudos Krab Bot Status*\n"
+    message = f"🤖 *Kiitos Krab Bot Status*\n"
     message += f"🟢 *Status:* Online\n"
     message += f"📦 *Version:* {VERSION}\n"
     message += f"⏱️ *Uptime:* {uptime_str}\n"

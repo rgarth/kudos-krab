@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  kudos-krab:
+  kiitos-krab:
     build: .
     ports:
       - "${PORT:-3000}:${PORT:-3000}"

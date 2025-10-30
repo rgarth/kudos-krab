@@ -56,7 +56,7 @@ aws-credentials
 *.sqlite
 
 # Build artifacts
-kudos-krab-lambda.zip
+kiitos-krab-lambda.zip
 build/
 dist/
 

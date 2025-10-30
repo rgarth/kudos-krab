@@ -1,5 +1,5 @@
 """
-AWS Lambda entry point for Kudos Krab Slack Bot
+AWS Lambda entry point for Kiitos Krab Slack Bot
 """
 from kudos_bot import lambda_handler
 

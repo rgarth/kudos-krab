@@ -1,6 +1,6 @@
-# Slack App Setup Guide for Kudos Krab 🦀
+# Slack App Setup Guide for Kiitos Krab 🦀
 
-This guide will walk you through creating and configuring a Slack app for Kudos Krab from scratch.
+This guide will walk you through creating and configuring a Slack app for Kiitos Krab from scratch.
 
 ## Step 1: Create a New Slack App
 
@@ -8,7 +8,7 @@ This guide will walk you through creating and configuring a Slack app for Kudos 
 2. Click **"Create New App"**
 3. Choose **"From scratch"**
 4. Fill in the details:
-   - **App Name**: `Kudos Krab` (or whatever you prefer)
+   - **App Name**: `Kiitos Krab` (or whatever you prefer)
    - **Pick a workspace**: Select your workspace
 5. Click **"Create App"**
 
@@ -18,7 +18,7 @@ This guide will walk you through creating and configuring a Slack app for Kudos 
 2. Under **"App Credentials"**, note down:
    - **Signing Secret** (you'll need this for `SLACK_SIGNING_SECRET`)
 3. Under **"Display Information"**, you can customize:
-   - **App Name**: `Kudos Krab`
+   - **App Name**: `Kiitos Krab`
    - **Short Description**: `Send kudos to team members with crab-themed enthusiasm!`
    - **App Icon**: Upload a crab emoji or image 🦀
 
@@ -69,7 +69,37 @@ This guide will walk you through creating and configuring a Slack app for Kudos 
    - For production: Your AWS Lambda endpoint
 4. Click **"Save Changes"**
 
-## Step 7: Environment Variables Summary
+## Step 7: Multi-Channel Support (Optional)
+
+Kiitos Krab now supports multiple channels automatically! Each channel operates independently:
+
+- **Channel Isolation**: Kudos given in #general don't affect #engineering
+- **Channel-Specific Leaderboards**: `/kk leaderboard` shows top users for that channel only
+- **Channel-Specific Stats**: `/kk stats` shows your stats for that channel only
+- **Channel-Specific Quotas**: Monthly quota applies per channel (10 kudos per channel)
+- **Automatic Channel Detection**: The bot automatically detects which channel commands are sent from
+
+**No additional setup required** - the bot will work in any channel where it's invited!
+
+### Migration for Existing Data
+
+If you have existing kudos data from before the multi-channel update, run the migration script:
+
+```bash
+python migrate_add_channel_id.py
+```
+
+This will add the `channel_id` column and populate existing records with your default channel ID.
+
+## Step 8: Get Bot User ID
+
+1. **Install your bot to your workspace** (if not done already)
+2. In Slack, **right-click on your bot's name** (in the sidebar or when mentioned)
+3. Select **"View profile"** or **"Get info"**
+4. Look for the **User ID** (starts with `U`)
+
+
+## Step 9: Environment Variables Summary
 
 After setup, you'll have these values for your `.env` file:
 
@@ -97,7 +127,7 @@ BOT_PERSONALITY=crab
 SLACK_CHANNEL_ID=C1234567890
 ```
 
-## Step 8: Local Testing with ngrok
+## Step 10: Local Testing with ngrok
 
 1. Install ngrok:
    ```bash
@@ -125,7 +155,7 @@ SLACK_CHANNEL_ID=C1234567890
      - Interactivity & Shortcuts
    - Use: `https://your-ngrok-url.ngrok.io/slack/events`
 
-## Step 9: Test Your Bot
+## Step 11: Test Your Bot
 
 1. In Slack, try the slash command in any channel:
    ```
@@ -134,7 +164,7 @@ SLACK_CHANNEL_ID=C1234567890
 
 2. Mention the bot:
    ```
-   @Kudos Krab
+   @Kiitos Krab
    ```
 
 3. Check the leaderboard (channel-specific):

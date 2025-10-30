@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Kudos Krab AWS Lambda Deployment Script
+# Kiitos Krab AWS Lambda Deployment Script
 
 set -e
 
-echo "🦀 Deploying Kudos Krab to AWS Lambda..."
+echo "🦀 Deploying Kiitos Krab to AWS Lambda..."
 
 # Create deployment directory
 DEPLOY_DIR="deployment"
@@ -22,16 +22,16 @@ cp *.py $DEPLOY_DIR/
 # Create deployment package
 echo "Creating deployment package..."
 cd $DEPLOY_DIR
-zip -r ../kudos-krab-lambda.zip .
+zip -r ../kiitos-krab-lambda.zip .
 cd ..
 
 # Clean up
 rm -rf $DEPLOY_DIR
 
-echo "✅ Deployment package created: kudos-krab-lambda.zip"
+echo "✅ Deployment package created: kiitos-krab-lambda.zip"
 echo ""
 echo "Next steps:"
-echo "1. Upload kudos-krab-lambda.zip to AWS Lambda"
+echo "1. Upload kiitos-krab-lambda.zip to AWS Lambda"
 echo "2. Set handler to: lambda_function.lambda_handler"
 echo "3. Configure environment variables:"
 echo "   - SLACK_BOT_TOKEN"

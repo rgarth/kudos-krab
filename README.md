@@ -1,4 +1,4 @@
-# Kudos Krab 🦀
+# Kiitos Krab 🦀
 
 An overly enthusiastic Slack bot for recording team kudos
 
@@ -63,7 +63,7 @@ CREATE INDEX idx_channel_configs_leaderboard ON channel_configs(leaderboard_chan
 
 ## Multi-Channel Support
 
-Kudos Krab supports multiple channels with per-channel configuration:
+Kiitos Krab supports multiple channels with per-channel configuration:
 
 - **Channel Isolation**: Kudos given in #general don't affect #engineering
 - **Channel-Specific Leaderboards**: `/kk leaderboard` shows top users for that channel only
@@ -104,7 +104,7 @@ Optional variables:
    ```
 
 2. **Deploy to AWS Lambda**:
-   - Upload `kudos-krab-lambda.zip`
+   - Upload `kiitos-krab-lambda.zip`
    - Set environment variables
    - Configure API Gateway trigger
 
@@ -115,10 +115,10 @@ Optional variables:
 1. **Build and run locally**:
    ```bash
    # Build image
-   docker build -t kudos-krab .
+   docker build -t kiitos-krab .
    
    # Run with environment variables
-   docker run -p 3000:3000 --env-file .env kudos-krab
+   docker run -p 3000:3000 --env-file .env kiitos-krab
    ```
 
 2. **Using Docker Compose**:
@@ -147,7 +147,7 @@ Optional variables:
 1. **Clone and setup**:
    ```bash
    git clone <your-repo>
-   cd kudos-krab
+   cd kiitos-krab
    cp env.example .env
    # Edit .env with your values
    ```

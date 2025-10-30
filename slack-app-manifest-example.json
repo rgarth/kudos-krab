@@ -1,8 +1,8 @@
 {
     "display_information": {
-        "name": "Kudos Krab",
+        "name": "Kiitos Krab",
         "description": "Send kudos to team members with crab-themed enthusiasm! 🦀",
-        "long_description": "Kudos Krab is a fun and engaging way to recognize and appreciate your team members. Send kudos to colleagues using the /kk command, view leaderboards, and track your recognition stats. Perfect for building team morale and celebrating wins together!"
+        "long_description": "Kiitos Krab is a fun and engaging way to recognize and appreciate your team members. Send kudos to colleagues using the /kk command, view leaderboards, and track your recognition stats. Perfect for building team morale and celebrating wins together!"
     },
     "settings": {
         "org_deploy_enabled": false,
@@ -12,7 +12,7 @@
     },
     "features": {
         "bot_user": {
-            "display_name": "Kudos Krab",
+            "display_name": "Kiitos Krab",
             "always_online": false
         },
         "slash_commands": [
