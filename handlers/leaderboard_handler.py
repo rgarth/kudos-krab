@@ -128,14 +128,13 @@ def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=N
         # Use the data directly - trust the user IDs in the database
         formatted_leaderboard = format_leaderboard(leaderboard_data, target_month, target_year, target_channel_id, db_manager)
         
-        # For public posting, use the target channel (or current channel if no target specified)
-        public_channel = target_channel_id if target_channel_id else channel_id
-        
-        if is_public and app.client and public_channel:
-            # Post to channel publicly using the Slack client
+        # For public posting, always post to the channel where the command was issued
+        # target_channel_id is only for determining which leaderboard data to show
+        if is_public and app.client and channel_id:
+            # Post to the channel where the command was issued (could be a DM or channel)
             try:
                 app.client.chat_postMessage(
-                    channel=public_channel,
+                    channel=channel_id,
                     text=formatted_leaderboard
                 )
                 # Also respond to user to confirm
