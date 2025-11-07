@@ -131,18 +131,23 @@ def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=N
         # For public posting, always post to the channel where the command was issued
         # target_channel_id is only for determining which leaderboard data to show
         if is_public and app.client and channel_id:
-            # Post to the channel where the command was issued (could be a DM or channel)
-            try:
-                app.client.chat_postMessage(
-                    channel=channel_id,
-                    text=formatted_leaderboard
-                )
-                # Also respond to user to confirm
-                personality = load_personality()
-                respond(personality['leaderboard']['posted_confirmation'])
-            except Exception as e:
-                logger.error(f"Error posting leaderboard to channel: {e}")
-                respond(f"❌ Failed to post leaderboard to channel. {str(e)}")
+            # Check if this is a DM (channel IDs starting with 'D' are DMs)
+            if channel_id.startswith('D'):
+                # Can't post publicly to a DM - just respond privately with a note
+                respond(f"{formatted_leaderboard}\n\n_Note: Public posting doesn't work in DMs. Use this command in a channel to post publicly._")
+            else:
+                # Post to the channel where the command was issued
+                try:
+                    app.client.chat_postMessage(
+                        channel=channel_id,
+                        text=formatted_leaderboard
+                    )
+                    # Also respond to user to confirm
+                    personality = load_personality()
+                    respond(personality['leaderboard']['posted_confirmation'])
+                except Exception as e:
+                    logger.error(f"Error posting leaderboard to channel: {e}")
+                    respond(f"❌ Failed to post leaderboard to channel. {str(e)}")
         else:
             # Respond privately to user
             respond(formatted_leaderboard)
