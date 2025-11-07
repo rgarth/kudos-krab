@@ -67,6 +67,7 @@ def get_channel_id_from_name(client, channel_name):
     """
     Convert a readable channel name (like #apacrabs or apacrabs) to a Slack channel ID.
     Returns the channel ID if found, None otherwise.
+    Raises an exception with a helpful message if the bot lacks required scopes.
     """
     try:
         # Remove # if present
@@ -75,6 +76,15 @@ def get_channel_id_from_name(client, channel_name):
         # Try to get channel info by name
         # First, try conversations.list to find the channel
         response = client.conversations_list(types="public_channel,private_channel", limit=1000)
+        
+        # Check for missing scopes error
+        if not response.get("ok"):
+            error = response.get("error", "")
+            if error == "missing_scope":
+                needed = response.get("needed", "channels:read,groups:read")
+                raise Exception(f"Bot is missing required scopes: {needed}. Please add these scopes in your Slack app settings (OAuth & Permissions > Scopes > Bot Token Scopes).")
+            else:
+                raise Exception(f"Slack API error: {error}")
         
         if response.get("ok"):
             for channel in response.get("channels", []):
@@ -87,6 +97,12 @@ def get_channel_id_from_name(client, channel_name):
         cursor = response.get("response_metadata", {}).get("next_cursor")
         while cursor:
             response = client.conversations_list(types="public_channel,private_channel", limit=1000, cursor=cursor)
+            if not response.get("ok"):
+                error = response.get("error", "")
+                if error == "missing_scope":
+                    needed = response.get("needed", "channels:read,groups:read")
+                    raise Exception(f"Bot is missing required scopes: {needed}. Please add these scopes in your Slack app settings.")
+                break
             if response.get("ok"):
                 for channel in response.get("channels", []):
                     if channel.get("name") == clean_name:
@@ -102,4 +118,4 @@ def get_channel_id_from_name(client, channel_name):
         
     except Exception as e:
         logger.error(f"Error looking up channel #{channel_name}: {e}")
-        return None
+        raise  # Re-raise to let the caller handle it

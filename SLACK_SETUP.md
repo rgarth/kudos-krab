@@ -30,9 +30,13 @@ This guide will walk you through creating and configuring a Slack app for Kiitos
    - `chat:write` - Send messages to channels
    - `commands` - Add slash commands
    - `app_mentions:read` - Read mentions of your app
+   - `channels:read` - Read public channel information (required for `/kk leaderboard #channelname`)
+   - `groups:read` - Read private channel information (required for `/kk leaderboard #channelname` with private channels)
 
 4. Click **"Install to Workspace"** at the top of the page
 5. After installation, copy the **"Bot User OAuth Token"** (starts with `xoxb-`) - this is your `SLACK_BOT_TOKEN`
+
+**Note:** The `channels:read` and `groups:read` scopes are optional but required if you want to use channel names (like `#channelname`) in leaderboard commands. Without these scopes, you can still use leaderboard commands but only in the current channel.
 
 ## Step 4: Create Slash Command
 

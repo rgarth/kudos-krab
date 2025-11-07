@@ -58,12 +58,20 @@ def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=N
         # If a channel name was specified, look it up
         target_channel_id = channel_id  # Default to current channel
         if target_channel_name:
-            looked_up_id = get_channel_id_from_name(app.client, target_channel_name)
-            if looked_up_id:
-                target_channel_id = looked_up_id
-                logger.info(f"Using specified channel {target_channel_name} -> {target_channel_id}")
-            else:
-                respond(f"❌ Channel {target_channel_name} not found. Make sure the bot has access to that channel.")
+            try:
+                looked_up_id = get_channel_id_from_name(app.client, target_channel_name)
+                if looked_up_id:
+                    target_channel_id = looked_up_id
+                    logger.info(f"Using specified channel {target_channel_name} -> {target_channel_id}")
+                else:
+                    respond(f"❌ Channel {target_channel_name} not found. Make sure the bot has access to that channel.")
+                    return
+            except Exception as e:
+                error_msg = str(e)
+                if "missing required scopes" in error_msg.lower():
+                    respond(f"❌ {error_msg}\n\nTo use channel names in leaderboard commands, add these scopes to your Slack app:\n• `channels:read` (for public channels)\n• `groups:read` (for private channels)")
+                else:
+                    respond(f"❌ Error looking up channel {target_channel_name}: {error_msg}")
                 return
         
         # Parse month and year from date parameters
