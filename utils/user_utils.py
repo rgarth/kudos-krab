@@ -66,6 +66,7 @@ def validate_kudos_recipients(user_id, unique_users, bot_user_id):
 def get_channel_id_from_name(client, channel_name):
     """
     Convert a readable channel name (like #apacrabs or apacrabs) to a Slack channel ID.
+    Only searches public channels for security/privacy reasons.
     Returns the channel ID if found, None otherwise.
     Raises an exception with a helpful message if the bot lacks required scopes.
     """
@@ -73,16 +74,16 @@ def get_channel_id_from_name(client, channel_name):
         # Remove # if present
         clean_name = channel_name.lstrip('#')
         
-        # Try to get channel info by name
-        # First, try conversations.list to find the channel
-        response = client.conversations_list(types="public_channel,private_channel", limit=1000)
+        # Only search public channels - private channels should be accessed from within that channel
+        # This prevents users from viewing leaderboards of private channels they're not members of
+        response = client.conversations_list(types="public_channel", limit=1000)
         
         # Check for missing scopes error
         if not response.get("ok"):
             error = response.get("error", "")
             if error == "missing_scope":
-                needed = response.get("needed", "channels:read,groups:read")
-                raise Exception(f"Bot is missing required scopes: {needed}. Please add these scopes in your Slack app settings (OAuth & Permissions > Scopes > Bot Token Scopes).")
+                needed = response.get("needed", "channels:read")
+                raise Exception(f"Bot is missing required scope: {needed}. Please add this scope in your Slack app settings (OAuth & Permissions > Scopes > Bot Token Scopes).")
             else:
                 raise Exception(f"Slack API error: {error}")
         
@@ -96,12 +97,12 @@ def get_channel_id_from_name(client, channel_name):
         # If not found in first page, try pagination
         cursor = response.get("response_metadata", {}).get("next_cursor")
         while cursor:
-            response = client.conversations_list(types="public_channel,private_channel", limit=1000, cursor=cursor)
+            response = client.conversations_list(types="public_channel", limit=1000, cursor=cursor)
             if not response.get("ok"):
                 error = response.get("error", "")
                 if error == "missing_scope":
-                    needed = response.get("needed", "channels:read,groups:read")
-                    raise Exception(f"Bot is missing required scopes: {needed}. Please add these scopes in your Slack app settings.")
+                    needed = response.get("needed", "channels:read")
+                    raise Exception(f"Bot is missing required scope: {needed}. Please add this scope in your Slack app settings.")
                 break
             if response.get("ok"):
                 for channel in response.get("channels", []):
