@@ -62,8 +62,12 @@ def parse_leaderboard_params(params):
 def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=None, say=None):
     """Handle leaderboard request with optional month/year parameters, channel name, and public posting"""
     try:
+        # Debug: Log what we received from Slack
+        logger.info(f"Leaderboard command received - raw params: '{params}'")
+        
         # Parse flexible parameters
         target_channel_id_or_name, is_public, is_complete, date_params = parse_leaderboard_params(params)
+        logger.info(f"Parsed - channel: {target_channel_id_or_name}, public: {is_public}, complete: {is_complete}, date: '{date_params}'")
         
         # If a channel was specified, determine the channel ID
         target_channel_id = channel_id  # Default to current channel
@@ -72,9 +76,11 @@ def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=N
             if target_channel_id_or_name.startswith('C') or target_channel_id_or_name.startswith('G') or target_channel_id_or_name.startswith('D'):
                 # Already a channel ID (from Slack's escaped format or user typed ID directly)
                 target_channel_id = target_channel_id_or_name
-                logger.info(f"Using channel ID directly: {target_channel_id}")
+                logger.info(f"Using channel ID directly from Slack escaped format: {target_channel_id}")
             else:
-                # It's a channel name, need to look it up
+                # It's a channel name (raw text), need to look it up
+                # Note: This should rarely happen if "Escape channels" is enabled in Slack app settings
+                logger.warning(f"Received raw channel name '{target_channel_id_or_name}' - Slack should escape this if 'Escape channels' is enabled")
                 try:
                     looked_up_id = get_channel_id_from_name(app.client, target_channel_id_or_name)
                     if looked_up_id:
@@ -86,9 +92,9 @@ def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=N
                 except Exception as e:
                     error_msg = str(e)
                     if "missing required scope" in error_msg.lower() or "missing required scopes" in error_msg.lower():
-                        respond(f"❌ {error_msg}\n\nTo use channel names in leaderboard commands, add the `channels:read` scope to your Slack app (OAuth & Permissions > Scopes > Bot Token Scopes).\n\nNote: Only public channels can be accessed by name. For private channels, use the leaderboard command from within that channel.")
+                        respond(f"❌ {error_msg}\n\nTo use channel names in leaderboard commands, either:\n1. Enable 'Escape channels, users, and links' in your Slack app slash command settings (recommended - no scope needed), or\n2. Add the `channels:read` scope to your Slack app (OAuth & Permissions > Scopes > Bot Token Scopes).")
                     else:
-                        respond(f"❌ Error looking up channel {target_channel_id_or_name}: {error_msg}\n\nNote: Only public channels can be accessed by name. If this is a private channel, use the leaderboard command from within that channel.")
+                        respond(f"❌ Error looking up channel {target_channel_id_or_name}: {error_msg}")
                     return
         
         # Parse month and year from date parameters
