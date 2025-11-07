@@ -61,3 +61,45 @@ def validate_kudos_recipients(user_id, unique_users, bot_user_id):
         errors.append("bot_kudos")
     
     return errors
+
+
+def get_channel_id_from_name(client, channel_name):
+    """
+    Convert a readable channel name (like #apacrabs or apacrabs) to a Slack channel ID.
+    Returns the channel ID if found, None otherwise.
+    """
+    try:
+        # Remove # if present
+        clean_name = channel_name.lstrip('#')
+        
+        # Try to get channel info by name
+        # First, try conversations.list to find the channel
+        response = client.conversations_list(types="public_channel,private_channel", limit=1000)
+        
+        if response.get("ok"):
+            for channel in response.get("channels", []):
+                if channel.get("name") == clean_name:
+                    channel_id = channel.get("id")
+                    logger.info(f"Found channel #{clean_name} -> {channel_id}")
+                    return channel_id
+        
+        # If not found in first page, try pagination
+        cursor = response.get("response_metadata", {}).get("next_cursor")
+        while cursor:
+            response = client.conversations_list(types="public_channel,private_channel", limit=1000, cursor=cursor)
+            if response.get("ok"):
+                for channel in response.get("channels", []):
+                    if channel.get("name") == clean_name:
+                        channel_id = channel.get("id")
+                        logger.info(f"Found channel #{clean_name} -> {channel_id}")
+                        return channel_id
+                cursor = response.get("response_metadata", {}).get("next_cursor")
+            else:
+                break
+        
+        logger.warning(f"Channel #{clean_name} not found")
+        return None
+        
+    except Exception as e:
+        logger.error(f"Error looking up channel #{channel_name}: {e}")
+        return None
