@@ -17,6 +17,8 @@ def show_help_message(respond, channel_id=None, db_manager=None):
 *{personality['help']['commands']}*
 • `/kk leaderboard [public]` - See this month's leaders (add 'public' to share)
 • `/kk leaderboard Aug|08 [2025] [public]` - See August leaders (year optional)
+• `/kk leaderboard #channelname` - See leaders for a specific channel
+• `/kk leaderboard public october #channelname` - Post October leaders to channel (any order)
 • `/kk stats` - Check your own kudos journey
 • `/kk config [edit|default]` - Show config, edit settings, or reset to defaults
 • `/kk version` - Show bot version
