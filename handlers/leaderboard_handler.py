@@ -12,31 +12,41 @@ logger = logging.getLogger(__name__)
 def parse_leaderboard_params(params):
     """
     Parse flexible leaderboard command parameters.
-    Extracts: channel name, flags (public, complete), and date information.
+    Extracts: channel name/ID, flags (public, complete), and date information.
     Handles parameters in any order.
     
-    Returns: (target_channel_name, is_public, is_complete, date_params)
+    Returns: (target_channel_id_or_name, is_public, is_complete, date_params)
     """
     if not params:
         return None, False, False, ""
     
     params_lower = params.lower()
     
-    # Extract channel name (starts with #)
-    # Slack channel names can contain letters, numbers, hyphens, and underscores
-    channel_name = None
-    channel_match = re.search(r'#([a-z0-9_-]+)', params, re.IGNORECASE)
-    if channel_match:
-        channel_name = channel_match.group(0)  # Keep the # in the name
+    # First, check for Slack's channel mention format: <#C123456|channel-name> or <#C123456>
+    # This is what Slack sends when "Escape channels, users, and links" is enabled
+    channel_id_or_name = None
+    slack_channel_match = re.search(r'<#([C][A-Z0-9]+)(?:\|[^>]*)?>', params)
+    if slack_channel_match:
+        # Slack already converted it to a channel ID!
+        channel_id_or_name = slack_channel_match.group(1)  # Just the ID part
+        logger.info(f"Found Slack channel mention format: {channel_id_or_name}")
+    else:
+        # Fall back to looking for #channelname format (raw text)
+        channel_match = re.search(r'#([a-z0-9_-]+)', params, re.IGNORECASE)
+        if channel_match:
+            channel_id_or_name = channel_match.group(0)  # Keep the # in the name
     
     # Extract flags
     is_public = "public" in params_lower or "share" in params_lower
     is_complete = "complete" in params_lower
     
-    # Extract date params - everything except channel name and flags
+    # Extract date params - everything except channel name/ID and flags
     date_params = params
-    if channel_name:
-        date_params = date_params.replace(channel_name, "").strip()
+    if channel_id_or_name:
+        # Remove both Slack format <#C123|name> and raw #name format
+        date_params = re.sub(r'<#[^>]+>', '', date_params)  # Remove <#C123|name>
+        date_params = re.sub(r'#' + re.escape(channel_id_or_name.lstrip('#')), '', date_params, flags=re.IGNORECASE)  # Remove #name
+        date_params = date_params.strip()
     if is_public:
         # Remove public/share keywords
         date_params = re.sub(r'\b(public|share)\b', '', date_params, flags=re.IGNORECASE).strip()
@@ -46,33 +56,40 @@ def parse_leaderboard_params(params):
     # Clean up extra spaces
     date_params = re.sub(r'\s+', ' ', date_params).strip()
     
-    return channel_name, is_public, is_complete, date_params
+    return channel_id_or_name, is_public, is_complete, date_params
 
 
 def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=None, say=None):
     """Handle leaderboard request with optional month/year parameters, channel name, and public posting"""
     try:
         # Parse flexible parameters
-        target_channel_name, is_public, is_complete, date_params = parse_leaderboard_params(params)
+        target_channel_id_or_name, is_public, is_complete, date_params = parse_leaderboard_params(params)
         
-        # If a channel name was specified, look it up
+        # If a channel was specified, determine the channel ID
         target_channel_id = channel_id  # Default to current channel
-        if target_channel_name:
-            try:
-                looked_up_id = get_channel_id_from_name(app.client, target_channel_name)
-                if looked_up_id:
-                    target_channel_id = looked_up_id
-                    logger.info(f"Using specified channel {target_channel_name} -> {target_channel_id}")
-                else:
-                    respond(f"❌ Channel {target_channel_name} not found. Only public channels can be accessed by name. If this is a private channel, use the leaderboard command from within that channel.")
+        if target_channel_id_or_name:
+            # Check if it's already a channel ID (from Slack's <#C123> format or starts with C/G/D)
+            if target_channel_id_or_name.startswith('C') or target_channel_id_or_name.startswith('G') or target_channel_id_or_name.startswith('D'):
+                # Already a channel ID (from Slack's escaped format or user typed ID directly)
+                target_channel_id = target_channel_id_or_name
+                logger.info(f"Using channel ID directly: {target_channel_id}")
+            else:
+                # It's a channel name, need to look it up
+                try:
+                    looked_up_id = get_channel_id_from_name(app.client, target_channel_id_or_name)
+                    if looked_up_id:
+                        target_channel_id = looked_up_id
+                        logger.info(f"Looked up channel name {target_channel_id_or_name} -> {target_channel_id}")
+                    else:
+                        respond(f"❌ Channel {target_channel_id_or_name} not found. Only public channels can be accessed by name. If this is a private channel, use the leaderboard command from within that channel.")
+                        return
+                except Exception as e:
+                    error_msg = str(e)
+                    if "missing required scope" in error_msg.lower() or "missing required scopes" in error_msg.lower():
+                        respond(f"❌ {error_msg}\n\nTo use channel names in leaderboard commands, add the `channels:read` scope to your Slack app (OAuth & Permissions > Scopes > Bot Token Scopes).\n\nNote: Only public channels can be accessed by name. For private channels, use the leaderboard command from within that channel.")
+                    else:
+                        respond(f"❌ Error looking up channel {target_channel_id_or_name}: {error_msg}\n\nNote: Only public channels can be accessed by name. If this is a private channel, use the leaderboard command from within that channel.")
                     return
-            except Exception as e:
-                error_msg = str(e)
-                if "missing required scope" in error_msg.lower() or "missing required scopes" in error_msg.lower():
-                    respond(f"❌ {error_msg}\n\nTo use channel names in leaderboard commands, add the `channels:read` scope to your Slack app (OAuth & Permissions > Scopes > Bot Token Scopes).\n\nNote: Only public channels can be accessed by name. For private channels, use the leaderboard command from within that channel.")
-                else:
-                    respond(f"❌ Error looking up channel {target_channel_name}: {error_msg}\n\nNote: Only public channels can be accessed by name. If this is a private channel, use the leaderboard command from within that channel.")
-                return
         
         # Parse month and year from date parameters
         month, year = parse_month_year(date_params)
