@@ -74,6 +74,13 @@ def get_channel_id_from_name(client, channel_name):
         # Remove # if present
         clean_name = channel_name.lstrip('#')
         
+        # Check if this is already a channel ID (starts with C, G, or D)
+        # Channel IDs: C = public channel, G = private channel, D = DM
+        if clean_name and len(clean_name) > 0 and clean_name[0].upper() in ['C', 'G', 'D']:
+            # This is already a channel ID, return it directly
+            logger.info(f"Input is already a channel ID: {clean_name}")
+            return clean_name
+        
         # Only search public channels - private channels should be accessed from within that channel
         # This prevents users from viewing leaderboards of private channels they're not members of
         response = client.conversations_list(types="public_channel", limit=1000)
