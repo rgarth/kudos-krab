@@ -138,27 +138,16 @@ def handle_leaderboard_command(respond, db_manager, app, params="", channel_id=N
             else:
                 # Post to the channel where the command was issued
                 try:
-                    result = app.client.chat_postMessage(
+                    app.client.chat_postMessage(
                         channel=channel_id,
                         text=formatted_leaderboard
                     )
-                    if not result.get("ok"):
-                        error = result.get("error", "unknown_error")
-                        if error == "channel_not_found":
-                            respond(f"❌ Cannot post to this channel. The bot may not be a member of this private channel. Please invite the bot to the channel first.")
-                        else:
-                            respond(f"❌ Failed to post leaderboard: {error}")
-                    else:
-                        # Also respond to user to confirm
-                        personality = load_personality()
-                        respond(personality['leaderboard']['posted_confirmation'])
+                    # Also respond to user to confirm
+                    personality = load_personality()
+                    respond(personality['leaderboard']['posted_confirmation'])
                 except Exception as e:
-                    error_msg = str(e)
                     logger.error(f"Error posting leaderboard to channel: {e}")
-                    if "channel_not_found" in error_msg:
-                        respond(f"❌ Cannot post to this channel. The bot may not be a member of this private channel. Please invite the bot to the channel first.")
-                    else:
-                        respond(f"❌ Failed to post leaderboard to channel. {error_msg}")
+                    respond(f"❌ Failed to post leaderboard to channel. {str(e)}")
         else:
             # Respond privately to user
             respond(formatted_leaderboard)
