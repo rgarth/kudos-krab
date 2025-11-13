@@ -267,17 +267,20 @@ class DatabaseManager:
         AND EXTRACT(YEAR FROM timestamp AT TIME ZONE 'UTC' + INTERVAL '%s hours') = EXTRACT(YEAR FROM CURRENT_DATE AT TIME ZONE 'UTC' + INTERVAL '%s hours')
         """
         
-        params = (user, channel_id, offset_hours, offset_hours, offset_hours, offset_hours)
+        # Use separate parameter tuples for each query
+        sent_params = (user, channel_id)
+        received_params = (user, channel_id)
+        monthly_params = (user, channel_id, offset_hours, offset_hours, offset_hours, offset_hours)
         
         with self.get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute(sent_sql, params)
+                cursor.execute(sent_sql, sent_params)
                 total_sent = cursor.fetchone()[0]
                 
-                cursor.execute(received_sql, params)
+                cursor.execute(received_sql, received_params)
                 total_received = cursor.fetchone()[0]
                 
-                cursor.execute(monthly_sent_sql, params)
+                cursor.execute(monthly_sent_sql, monthly_params)
                 monthly_sent = cursor.fetchone()[0]
                 
                 return {
